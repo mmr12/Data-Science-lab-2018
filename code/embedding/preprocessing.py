@@ -44,6 +44,12 @@ def remove_punc(s, exceptions):
     return re.sub(pattern, "", s)
 
 
+def remove_custom_stopwords(s, stopwords):
+    for stopword in stopwords:
+        s = s.replace(stopword, "")
+    return s
+
+
 def lower_case(s):
     return s.lower()
 
@@ -51,14 +57,17 @@ def lower_case(s):
 def preprocess_sentence_fn(s):
     # Preprocess a single sentence to a list of tokens
     punc_exceptions = ['<', '>']
-    filters = [remove_ip,
+    custom_stopwords = ['dear', 'sincerely', 'thanks', 'yours', 'regards']
+
+    filters = [lower_case,
+               remove_ip,
                remove_email,
                remove_mailto,
                remove_url,
                lambda x: remove_punc(x, punc_exceptions),
                remove_stopwords,
+               lambda x: remove_custom_stopwords(x, custom_stopwords),
                strip_multiple_whitespaces,
-               lower_case,
                stem_text,
                strip_numeric]
     out = preprocess_string(s, filters=filters)
