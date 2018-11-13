@@ -228,3 +228,6 @@ fabric.properties
 
 # Avoid the data 
 data/
+
+# Avoid uploading the embedding models
+*.model
