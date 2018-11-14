@@ -5,8 +5,8 @@ from gensim.models import Word2Vec
 from gensim.models import KeyedVectors
 
 # Read in the data
-ticket_dat = pd.read_csv('../../data/ticket_dat.csv')
-faq_dat = pd.read_csv('../../data/faq_dat.csv')
+ticket_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/ticket_dat.csv')
+faq_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/faq_dat.csv')
 
 # Replace the NaNs
 ticket_dat.fillna('', inplace=True)
@@ -29,7 +29,7 @@ all_docs = faq_ques_docs + faq_ans_docs + ticket_content_docs
 path = get_tmpfile("models/word2vec.model")
 
 print('Training')
-model = Word2Vec(all_docs, size=300, window=5, min_count=1, workers=4)
+model = Word2Vec(all_docs, size=128, window=5, min_count=1, workers=4)
 model.save("models/word2vec.model")
 
 # Load a pretrained google model and train on it some more
