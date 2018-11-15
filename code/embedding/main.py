@@ -5,8 +5,8 @@ from gensim.models import Word2Vec
 from gensim.models import KeyedVectors
 
 # Read in the data
-ticket_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/ticket_dat.csv')
-faq_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/faq_dat.csv')
+ticket_dat = pd.read_csv('../../data/ticket_dat.csv')
+faq_dat = pd.read_csv('../../data/faq_dat.csv')
 
 # Replace the NaNs
 ticket_dat.fillna('', inplace=True)
