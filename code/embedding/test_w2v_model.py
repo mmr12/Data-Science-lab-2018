@@ -2,6 +2,7 @@ import sys
 from gensim.models import Word2Vec
 from gensim.models.doc2vec import Doc2Vec
 from preprocessing import *
+import pickle
 
 # Function for testing a doc2vec word2vec model from the command line.
 # run python test_w2v_model.py [model name].model [model_type] [test word] to print the most similar docs or words
@@ -19,13 +20,16 @@ if model_type == "word":
     print(model.wv.most_similar(positive=prepro_query))
 
 elif model_type == "doc":
+    # Unpickle the tagged docs
+    with open("models/all_docs.txt", "rb") as fp:
+        all_docs = pickle.load(fp)
+
     model = Doc2Vec.load('models/' + fname)
     query_doc_vec = model.infer_vector(prepro_query)
     most_similar_docs = model.docvecs.most_similar([query_doc_vec])
 
     for similar_doc in most_similar_docs[0:4]:
-        print(model.docvecs)
-        print('[{}] '.format(round(similar_doc[1], 5))+' '.join(model.wv[similar_doc[0]].words) + "\n")
+        print('[{}] '.format(round(similar_doc[1], 5))+all_docs[similar_doc[0]] + "\n")
 
 
 else:
