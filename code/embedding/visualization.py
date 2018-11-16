@@ -11,18 +11,17 @@ import pandas as pd
 fname = sys.argv[1]  #embedding model
 
 #PARAMETERS for TSNE
-perp = [5, 10] #tsne perplexity
-#[5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-n_iter = 250 #tsne iterations
-n_comp = 2 #do you want a 2D or 3D visualization?
+perp =  [20] #tsne perplexity
+n_iter = 2500 #tsne iterations
+n_comp = 3 #do you want a 2D or 3D visualization?
 
 
 #load the embedding model
 model = Word2Vec.load('models/' + fname)
 
 # Read in the data
-ticket_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/ticket_dat.csv')
-faq_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/faq_dat.csv')
+ticket_dat = pd.read_csv('../../data/ticket_dat.csv')
+faq_dat = pd.read_csv('../../data/faq_dat.csv')
 
 # Replace the NaNs
 ticket_dat.fillna('', inplace=True)
