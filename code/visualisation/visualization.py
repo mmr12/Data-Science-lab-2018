@@ -1,4 +1,4 @@
-from preprocessing import *
+from code.embedding.preprocessing import *
 from visualization_utils import *
 from gensim.models import Word2Vec
 import sys
@@ -21,8 +21,8 @@ n_comp = 2 #do you want a 2D or 3D visualization?
 model = Word2Vec.load('models/' + fname)
 
 # Read in the data
-ticket_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/ticket_dat.csv')
-faq_dat = pd.read_csv('../../../../Documents/ETH/3rd semester/Data Science Lab/data/faq_dat.csv')
+ticket_dat = pd.read_csv('../../data/ticket_dat.csv')
+faq_dat = pd.read_csv('../../data/faq_dat.csv')
 
 # Replace the NaNs
 ticket_dat.fillna('', inplace=True)
