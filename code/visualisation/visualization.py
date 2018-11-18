@@ -1,4 +1,4 @@
-from preprocessing import *
+from code.embedding.preprocessing import *
 from visualization_utils import *
 from gensim.models import Word2Vec
 import sys
