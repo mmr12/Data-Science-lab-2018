@@ -5,7 +5,7 @@ from preprocessing import *
 import pickle
 
 # Function for testing a doc2vec word2vec model from the command line.
-# run python test_w2v_model.py [model name].model [model_type] [test word] to print the most similar docs or words
+# run python test_model.py [model name].model [model_type] [test word] to print the most similar docs or words
 
 fname = sys.argv[1]
 model_type = sys.argv[2]
@@ -21,7 +21,7 @@ if model_type == "word":
 
 elif model_type == "doc":
     # Unpickle the tagged docs
-    with open("models/all_docs.txt", "rb") as fp:
+    with open("models/doc_data/all_docs.txt", "rb") as fp:
         all_docs = pickle.load(fp)
 
     model = Doc2Vec.load('models/' + fname)

@@ -14,17 +14,38 @@ ticket_dat.fillna('', inplace=True)
 faq_dat.fillna('', inplace=True)
 
 # Make sentences into
-faq_ques = list(faq_dat.ques_content_translation)
+faq_ques = list(faq_dat.question)
+n_faq_ques = len(faq_ques)
 
-faq_ans = list(faq_dat.ans_content_translated)
+# FAQ answer is the answer and its title concatenated
+faq_ans = list(faq_dat.answer_title + " " + faq_dat.answer)
+n_faq_ans = len(faq_ans)
 
-ticket_content = list(ticket_dat.content_translated)
 
-all_docs = faq_ques + faq_ans + ticket_content
+ticket_ques = list(ticket_dat.question)
+n_ticket_ques = len(ticket_ques)
 
-# Need to save this list as a pickle so we can decode IDs when we test things
-with open("models/all_docs.txt", "wb") as fp:
+
+ticket_ans = list(ticket_dat.answer)
+n_ticket_ans = len(ticket_ans)
+
+
+all_docs = faq_ques + faq_ans + ticket_ques + ticket_ans
+
+# create a dictionary storing the cut points for the four datasets so we can re-split them after.
+# use like all_docs[id_dict['faq_ques']] to get all faq questions.
+id_dict = {
+    'faq_ques': range(0, n_faq_ques),
+    'faq_ans': range(n_faq_ques, n_faq_ques + n_faq_ans),
+    'ticket_ques': range(n_faq_ques + n_faq_ans, n_faq_ques + n_faq_ans + n_ticket_ques),
+    'ticket_ans': range(n_faq_ques + n_faq_ans + n_ticket_ques, n_faq_ques + n_faq_ans + n_ticket_ques + n_ticket_ans)
+}
+
+# Need to save this list and id dictionary as a pickle so we can decode IDs when we test things
+with open("models/doc_data/all_docs.txt", "wb") as fp:
     pickle.dump(all_docs, fp)
+with open("models/doc_data/id_dict.txt", "wb") as fp:
+    pickle.dump(id_dict, fp)
 
 all_docs_prepro = preprocess_docs_fn(all_docs)
 

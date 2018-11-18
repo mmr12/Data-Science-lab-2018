@@ -29,11 +29,16 @@ def sim_to_faq(doc_id):
 sim_to_faq_vec = np.vectorize(sim_to_faq, otypes=[object])
 
 print('Computing Similarities...')
-d = np.stack(sim_to_faq_vec(test_document_ids))
+ticket_faq_dists = np.stack(sim_to_faq_vec(test_document_ids))
+ticket_faq_map = np.argmin(ticket_faq_dists, axis=1)
 
-print(d.shape)
-print(d)
+# We should threshold the distances so that if the minimum distance is not below a certain value then we assign it an
+# unknown class
+big_dist = [ticket_faq_dists.min(axis=1) > 0.5]
+ticket_faq_map[big_dist] = -1 # Set all thresholded distances to have label -1
 
+with open("mappings/ticket_faq_map.txt", "wb") as fp:
+    pickle.dump(ticket_faq_map, fp)
 
 
 
