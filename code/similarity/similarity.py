@@ -14,7 +14,7 @@ with open("../embedding/models/doc_data/all_docs.txt", "rb") as fp:
 with open("../embedding/models/doc_data/id_dict.txt", "rb") as fp:
     id_dict = pickle.load(fp)
 
-test_document_ids = np.array(id_dict['ticket_ans'])
+ticket_ans_ids = np.array(id_dict['ticket_ans'])
 all_faq_ans = id_dict['faq_ans']
 
 # Presently compute distances to all and then filter to FAQs after, specifying other_docs = all_faq_ans doesn't seem
@@ -29,7 +29,7 @@ def sim_to_faq(doc_id):
 sim_to_faq_vec = np.vectorize(sim_to_faq, otypes=[object])
 
 print('Computing Similarities...')
-ticket_faq_dists = np.stack(sim_to_faq_vec(test_document_ids))
+ticket_faq_dists = np.stack(sim_to_faq_vec(ticket_ans_ids))
 ticket_faq_map = np.argmin(ticket_faq_dists, axis=1)
 
 # We should threshold the distances so that if the minimum distance is not below a certain value then we assign it an
