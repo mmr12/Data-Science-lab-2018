@@ -5,6 +5,11 @@ from gensim.models import Word2Vec
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import pickle
 
+# to run independently for the first time type:
+# python embedding.py
+
+# Model agnostic part
+#
 # Read in the data
 ticket_dat = pd.read_csv('../../data/ticket_dat.csv')
 faq_dat = pd.read_csv('../../data/faq_dat.csv')
@@ -29,7 +34,7 @@ n_ticket_ques = len(ticket_ques)
 ticket_ans = list(ticket_dat.answer)
 n_ticket_ans = len(ticket_ans)
 
-
+# Model assumption: same embedding for all
 all_docs = faq_ques + faq_ans + ticket_ques + ticket_ans
 
 # create a dictionary storing the cut points for the four datasets so we can re-split them after.
@@ -49,7 +54,7 @@ with open("models/doc_data/id_dict.txt", "wb") as fp:
 
 all_docs_prepro = preprocess_docs_fn(all_docs)
 
-
+# Model assumption: word2vec
 # Create word embedding model
 word_path = "models/word2vec.model"
 word_tempfile = get_tmpfile(word_path)
@@ -59,7 +64,7 @@ word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=
 word_model.save(word_path)
 print('Trained')
 
-
+# Model assumption: doc2vec
 # Create Doc2Vec model
 doc_path = "models/doc2vec.model"
 doc_tempfile = get_tmpfile(doc_path)
