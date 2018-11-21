@@ -8,6 +8,8 @@ import pickle
 # to run independently for the first time type:
 # python embedding.py
 
+# TODO: add how to run without preprocessing the data -> bypass to look at embeddings (if needed)
+
 # Model agnostic part
 #
 # Read in the data

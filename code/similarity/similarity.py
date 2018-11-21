@@ -2,6 +2,10 @@ from gensim.models.doc2vec import Doc2Vec
 import pickle
 import numpy as np
 
+# Function to calculate similarities between docs in Doc2Vec
+# run       python similarity.py
+# output    ticket_faq_map [pickle file]
+
 print('Loading Model...')
 model_path = '../embedding/models/doc2vec.model'
 model = Doc2Vec.load(model_path)
@@ -41,4 +45,4 @@ with open("mappings/ticket_faq_map.txt", "wb") as fp:
     pickle.dump(ticket_faq_map, fp)
 
 
-
+# TODO: how can we estimate how good this measure is?
