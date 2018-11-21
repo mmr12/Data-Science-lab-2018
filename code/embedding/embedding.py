@@ -5,6 +5,8 @@ from gensim.models import Word2Vec
 from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import pickle
 
+# to run for the first time type:
+# python embedding.py
 
 # Model agnostic part
 #
