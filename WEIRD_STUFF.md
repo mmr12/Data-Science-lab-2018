@@ -9,7 +9,6 @@ Doc is divided according to the folders.
 
 ##Embedding models
 
-
 #SIMILARITY 
 
 
