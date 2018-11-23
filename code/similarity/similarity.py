@@ -2,7 +2,6 @@ from gensim.models.doc2vec import Doc2Vec
 import pickle
 import numpy as np
 
-#for running: in the console type python similarity.py
 def similarity():
     print('Loading Model...')
     model_path = 'embedding/models/doc2vec.model'
