@@ -52,7 +52,8 @@ def embedding(mod):
         pickle.dump(id_dict, fp)
 
     all_docs_prepro = preprocess_docs_fn(all_docs)
-
+    with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
+        pickle.dump(all_docs_prepro, fp)
 
 
     # Model assumption: word2vec
