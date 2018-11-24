@@ -23,5 +23,5 @@ if __name__== "__main__" :
     mod = args.embedding
 
     embedding(mod)
-    similarity()
-    classifier()
+    similarity(mod)
+    #classifier()
