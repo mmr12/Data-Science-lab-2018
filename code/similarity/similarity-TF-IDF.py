@@ -7,19 +7,19 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 def similarity():
     # load model
-    TFiDF = load('../embedding/models/TF-IFD-ans.joblib')
+    TFiDF = load('embedding/models/TF-IFD-ans.joblib')
 
     # load data
-    with open("../embedding/models/doc_data/all_docs_sep.pkl", "rb") as fp:
+    with open("embedding/models/doc_data/all_docs_sep.pkl", "rb") as fp:
         all_docs_sep = pickle.load(fp)
-    with open("../embedding/models/doc_data/id_dict_sep.pkl", "rb") as fp:
-        id_dict_sep = pickle.load(fp)
 
-    n_faq_ans = len(id_dict_sep['faq_ans'])
+    faq_ans = all_docs_sep['FAQ_ans']
+    ticket_ans = all_docs_sep['ticket_ans']
 
     # make matrix
-    matrix = TFiDF.transform(all_docs_sep['ans'])
-    sim_matrix = cosine_similarity(matrix[:n_faq_ans,:], matrix[n_faq_ans:,:])
+    FAQ_matrix = TFiDF.transform(faq_ans)
+    ticket_matrix = TFiDF.transform(ticket_ans)
+    sim_matrix = cosine_similarity(FAQ_matrix, ticket_matrix)
 
     # mapping
     FAQ_per_ticket = np.argmax(sim_matrix, axis=0)
@@ -40,7 +40,7 @@ def similarity():
     }
 
     print(n_unique, 'classes, with ', round(n_nonassigned / n_tickets, 2), '% non assigned tickets')
-    with open("mappings/ticket_faq_map_TF-IDF_cosine.pkl", "wb") as fp:
+    with open("similarity/mappings/ticket_faq_map_TF-IDF_cosine.pkl", "wb") as fp:
         pickle.dump(output, fp)
 
 if __name__== "__main__":
