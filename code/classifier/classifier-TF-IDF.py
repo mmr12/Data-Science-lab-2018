@@ -40,6 +40,7 @@ def classifier():
     RF_final = RandomForestClassifier()
     RF_final.fit(matrix, mapping)
     dump(RF_final, 'classifier/models/RF_TFiDF.joblib')
+    # dump(RF_final.predict(matrix), '/Users/margheritarosnati/Desktop/temp.joblib') #debug
 
 
 def nn_classifier():
