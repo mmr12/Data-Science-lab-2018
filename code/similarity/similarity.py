@@ -16,31 +16,32 @@ def similarity(mod):
     # Unpickle the document data
     with open("embedding/models/doc_data/all_docs.txt", "rb") as fp:
         all_docs = pickle.load(fp)
-    with open("embedding/models/doc_data/all_docs.txt", "rb") as fp:
-        all_docs_prepro = pickle.load(fp)
 
     if mod == "word2vec":
+        with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+            all_docs_prepro = pickle.load(fp)
+
         print('Loading Model...')
         model_path = 'embedding/models/word2vec.model'
         model = Word2Vec.load(model_path)
 
         #create doc vector for tickets answers i.e. average over each ticket ans the word2vec vector for each word
-        mean_ticket_ans = np.empty((5004, 128), dtype=float)
-        for j in range(5782, 10786):
+        mean_ticket_ans = np.empty((len(id_dict['ticket_ans']), 128), dtype=float)
+        for j in id_dict['ticket_ans']:
             sentence = all_docs_prepro[j]
             words = np.empty((len(sentence), 128), dtype=float)
             for i in range(len(sentence)):
                 words[i] = model[sentence[i]]
-            mean_ticket_ans[j - 5782] = np.apply_along_axis(np.mean, 0, words)
+            mean_ticket_ans[j - id_dict['ticket_ans'][0]] = np.apply_along_axis(np.mean, 0, words)
 
         #create doc vector for faq ans i.e. average over each faq ans the word2vec vector for each word
-        mean_faq_ans = np.empty((389, 128), dtype=float)
-        for j in range(389, 778):
+        mean_faq_ans = np.empty((len(id_dict['faq_ans']), 128), dtype=float)
+        for j in id_dict['faq_ans']:
             sentence = all_docs_prepro[j]
             words = np.empty((len(sentence), 128), dtype=float)
             for i in range(len(sentence)):
                 words[i] = model[sentence[i]]
-            mean_faq_ans[j - 389] = np.apply_along_axis(np.mean, 0, words)
+            mean_faq_ans[j - id_dict['faq_ans'][0]] = np.apply_along_axis(np.mean, 0, words)
 
         #create matrix with cosine distances from all ticket ans to all faq ans
         ticket_faq_dists = np.empty((len(mean_ticket_ans), len(mean_faq_ans)), dtype=float)
@@ -54,7 +55,6 @@ def similarity(mod):
         #too big distances are set to a separate class
         big_dist = [ticket_faq_dists.min(axis=1) > 0.7]
         ticket_faq_map[big_dist] = -1  # Set all thresholded distances to have label -1
-        #to do: correct this assignment
 
         with open("similarity/mappings/ticket_faq_map_word2vec_cosine.txt", "wb") as fp:
             pickle.dump(ticket_faq_map, fp)

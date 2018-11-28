@@ -13,7 +13,7 @@ def similarity():
     with open("embedding/models/doc_data/all_docs_sep.pkl", "rb") as fp:
         all_docs_sep = pickle.load(fp)
 
-    faq_ans = all_docs_sep['FAQ_ans']
+    faq_ans = all_docs_sep['faq_ans']
     ticket_ans = all_docs_sep['ticket_ans']
 
     # make matrix
