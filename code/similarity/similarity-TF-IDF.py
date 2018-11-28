@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 from joblib import load
 from sklearn.metrics.pairwise import cosine_similarity
-
+import pandas as pd
 
 def similarity():
     # load model
@@ -33,6 +33,11 @@ def similarity():
     n_unique = len(np.unique(FAQ_per_ticket))
     n_nonassigned = np.shape(FAQ_per_ticket[strength_FAQ_ticket < thres])[0]
     n_tickets = len(FAQ_per_ticket)
+    # How many tickets each FAQ is assigned
+    counts_per_faq = pd.Series(FAQ_per_ticket).value_counts()
+    print(counts_per_faq)
+
+
 
     output = {
         'classes': n_tickets,
