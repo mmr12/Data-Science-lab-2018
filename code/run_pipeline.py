@@ -1,7 +1,7 @@
 from embedding.embedding import embedding
 from similarity.similarity import similarity
 from classifier.classifier import classifier
-from predict.predict import predict
+from prediction.predict import predict
 
 
 if __name__== "__main__" :

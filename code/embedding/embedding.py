@@ -66,8 +66,9 @@ def embedding():
     with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
         pickle.dump(all_docs_prepro, fp)
 
-
+    ############################################################################################################
     # Model assumption: word2vec
+
     # checking if embedding model already exists
     exists = os.path.isfile('embedding/models/word2vec.model')
     if exists:
@@ -80,8 +81,9 @@ def embedding():
         word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=4)
         word_model.save(word_path)
         print('Trained')
-
+    #####################################################################################################
     # Model assumption: doc2vec
+
     # checking if embedding model already exists
     exists = os.path.isfile('embedding/models/doc2vec.model')
     if exists:
@@ -98,24 +100,22 @@ def embedding():
         doc_model.save(doc_path)
         print('Trained')
 
-        # Model assumption: TF-IDF
-        # initialise model
-        # checking if embedding model already exists
-        exists = os.path.isfile('embedding/models/TF-IFD-ans.joblib')
-        if exists:
-            print('TF-IDF embedding model already existing')
-        else:
-            print('Training TF-IDF Model')
-            vectoriser = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-            # create matrix: rows = all ans; cols = TI-IDF weighted word vector
-            vectoriser.fit(all_ans)
-            dump(vectoriser, 'embedding/models/TF-IFD-ans.joblib')
-            # train model on ans too
-            # TODO: use this for classification?
-            vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-            vec2.fit(ticket_ques)
-            dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
-            print('Trained')
+        ########################################################################################################
+    # Model assumption: TF-IDF
+
+    # initialise model
+    # checking if embedding model already exists
+    print('Training TF-IDF Model')
+    vectoriser = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
+    # create matrix: rows = all ans; cols = TI-IDF weighted word vector
+    vectoriser.fit(all_ans)
+    dump(vectoriser, 'embedding/models/TF-IFD-ans.joblib')
+    # train model on ans too
+    # TODO: use this for classification?
+    vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
+    vec2.fit(ticket_ques)
+    dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
+    print('Trained')
 
 if __name__== "__main__":
     embedding()
