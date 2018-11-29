@@ -231,5 +231,13 @@ data/
 
 # Avoid uploading the embedding models
 *.model
+*/models
 */models/
+*/models/doc_data/
 */mappings/
+
+# avoid .joblib
+*.joblib
+
+# MR: somehow this file is preventing me from pulling:
+*.pkl
