@@ -12,26 +12,22 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 def embedding():
 
     # Read in the data
-    ticket_dat = pd.read_csv('../data/11-24-ticket_dat.csv')
-    faq_dat = pd.read_csv('../data/11-24-faq_dat_cleaned.csv')
-
+    ticket_dat = pd.read_csv('../data/11-29-ticket_dat.csv')
+    faq_dat = pd.read_csv('../data/11-29-faq_dat.csv')
     # Replace the NaNs
     ticket_dat.fillna('', inplace=True)
     faq_dat.fillna('', inplace=True)
 
-    # Make sentences into
+    # FAQ question
     faq_ques = list(faq_dat.question)
     n_faq_ques = len(faq_ques)
-
-    # FAQ answer is the answer and its title concatenated
+    # FAQ answer
     faq_ans = list(faq_dat.answer_title + " " + faq_dat.answer)
     n_faq_ans = len(faq_ans)
-
-
+    #ticket question
     ticket_ques = list(ticket_dat.question)
     n_ticket_ques = len(ticket_ques)
-
-
+    #ticket ans
     ticket_ans = list(ticket_dat.answer)
     n_ticket_ans = len(ticket_ans)
 
@@ -65,6 +61,7 @@ def embedding():
     all_docs_prepro = preprocess_docs_fn(all_docs)
     with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
         pickle.dump(all_docs_prepro, fp)
+
 
     ############################################################################################################
     # Model assumption: word2vec

@@ -19,7 +19,6 @@ def classifier():
     with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
         all_docs_prepro = pickle.load(fp)
 
-    """
     # Load the Word2Vec model
     model_path = 'embedding/models/word2vec.model'
     model = Word2Vec.load(model_path)
@@ -55,7 +54,7 @@ def classifier():
 
     print('Training Score: {0} \n Cross Val Score: {1}'.format(train_score, cv_score))
     print('###############')
-    """
+
     ###############################################################################################
 
     print('DOC2VEC PERFORMANCE')
