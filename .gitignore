@@ -231,5 +231,6 @@ data/
 
 # Avoid uploading the embedding models
 *.model
+*/models
 */models/
 */mappings/
