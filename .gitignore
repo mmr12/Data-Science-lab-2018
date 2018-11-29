@@ -238,3 +238,6 @@ data/
 
 # avoid .joblib
 *.joblib
+
+# MR: somehow this file is preventing me from pulling:
+*.pkl
