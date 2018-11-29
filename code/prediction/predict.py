@@ -38,7 +38,7 @@ def predict():
     nFAQ = np.argmax(pred)
 
     print("The FAQ associated with \n\n", Q, "\nwith probability ", round(prob, 2), " is\n")
-    print("FAQ question:\t\t", all_docs_sep['FAQ_ques'][nFAQ], "\n\nFAQ ans:\t\t", all_docs_sep['FAQ_ans'][nFAQ])
+    print("FAQ question:\t\t", all_docs_sep['faq_ques'][nFAQ], "\n\nFAQ ans:\t\t", all_docs_sep['faq_ans'][nFAQ])
 
 
 if __name__ == "__main__":

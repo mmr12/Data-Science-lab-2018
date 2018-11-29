@@ -22,8 +22,8 @@ n_comp = 3 #do you want a 2D or 3D visualization?
 model = Word2Vec.load('../embedding/models/' + fname)
 
 # Read in the data
-ticket_dat = pd.read_csv('../../data/ticket_dat.csv')
-faq_dat = pd.read_csv('../../data/faq_dat.csv')
+ticket_dat = pd.read_csv('../../data/11-24-ticket_dat.csv')
+faq_dat = pd.read_csv('../../data/11-24-faq_dat_cleaned.csv')
 
 # Replace the NaNs
 ticket_dat.fillna('', inplace=True)
