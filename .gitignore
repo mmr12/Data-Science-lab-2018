@@ -233,4 +233,8 @@ data/
 *.model
 */models
 */models/
+*/models/doc_data/
 */mappings/
+
+# avoid .joblib
+*.joblib
