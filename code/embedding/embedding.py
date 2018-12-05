@@ -1,13 +1,9 @@
 import pandas as pd
 from .preprocessing import *
-from gensim.test.utils import get_tmpfile
-from gensim.models import Word2Vec
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from .tfidf import *
+from .doc2vec import *
+from .word2vec import *
 import pickle
-import os
-from joblib import dump
-from sklearn.feature_extraction.text import TfidfVectorizer
-
 
 def embedding():
 
@@ -33,7 +29,7 @@ def embedding():
 
     # Model assumption: same embedding for all
     all_docs = faq_ques + faq_ans + ticket_ques + ticket_ans
-    # Model assumption: two different embeddings
+    # Model assumption: different embeddings
     all_ans = faq_ans + ticket_ans
 
     # create a dictionary storing the cut points for the four datasets so we can re-split them after.
@@ -58,63 +54,33 @@ def embedding():
     with open("embedding/models/doc_data/all_docs_sep.pkl", "wb") as fp:
         pickle.dump(all_docs_sep, fp)
 
-    all_docs_prepro = preprocess_docs_fn(all_docs)
-    with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
-        pickle.dump(all_docs_prepro, fp)
+    #preprocessed data to be saved
+    all_ans_prepro = preprocess_docs_fn(all_ans)
+    with open("embedding/models/doc_data/all_ans_prepro.txt", "wb") as fp:
+        pickle.dump(all_ans_prepro, fp)
 
+    ticket_ques_prepro = preprocess_docs_fn(ticket_ques)
+    with open("embedding/models/doc_data/ticket_ques_prepro.txt", "wb") as fp:
+        pickle.dump(ticket_ques_prepro, fp)
 
-    ############################################################################################################
+    ############################################
+
     # Model assumption: word2vec
+    word_embedding(all_ans_prepro, ticket_ques_prepro)
+    print('Word2vec training done')
 
-    # checking if embedding model already exists
-    exists = os.path.isfile('embedding/models/word2vec.model')
-    if exists:
-        print('Word2vec embedding model already existing')
-    # Create word embedding model
-    else:
-        word_path = "embedding/models/word2vec.model"
-        word_tempfile = get_tmpfile(word_path)
-        print('Training Word2Vec Model')
-        word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=4)
-        word_model.save(word_path)
+    ############################################
 
-        print('Trained')
-    #####################################################################################################
-    """   
     # Model assumption: doc2vec
+    #document_embedding(all_ans, ticket_ques)
+    #print('Doc2vec training done')
 
-    # checking if embedding model already exists
-    exists = os.path.isfile('embedding/models/doc2vec.model')
-    if exists:
-        print('Doc2vec embedding model already existing')
-    # Create Doc2Vec model
-    else:
-        doc_path = "embedding/models/doc2vec.model"
-        doc_tempfile = get_tmpfile(doc_path)
-        # DOC2VEC Model. 1 is distributed memory, 0 is distributed bag of words
-        MODEL = 1
-        print('Training Doc2Vec Model')
-        tagged_docs = [TaggedDocument(doc, [i]) for i, doc in enumerate(all_docs_prepro)]
-        doc_model = Doc2Vec(tagged_docs, vector_size=128, window=5, min_count=1, workers=4, dm=MODEL)
-        doc_model.save(doc_path)
-        print('Trained')
-    """
-        ########################################################################################################
+    #############################################
+
     # Model assumption: TF-IDF
-
-    # initialise model
-    # checking if embedding model already exists
-    print('Training TF-IDF Model')
-    vectoriser = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-    # create matrix: rows = all ans; cols = TI-IDF weighted word vector
-    vectoriser.fit(all_ans)
-    dump(vectoriser, 'embedding/models/TF-IFD-ans.joblib')
-    # train model on ans too
-    # TODO: use this for classification?
-    vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-    vec2.fit(ticket_ques)
-    dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
-    print('Trained')
+    #print('Training TF-IDF Model')
+    #tfidf(all_ans, ticket_ques)
+    #print('Trained')
 
 if __name__== "__main__":
     embedding()
