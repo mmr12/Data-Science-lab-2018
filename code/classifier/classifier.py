@@ -56,7 +56,7 @@ def classifier():
     print('###############')
 
     ###############################################################################################
-
+    """
     print('DOC2VEC PERFORMANCE')
     with open("similarity/mappings/ticket_faq_map_doc2vec_cosine.txt", "rb") as fp:
         ticket_faq_map = pickle.load(fp)
@@ -87,7 +87,7 @@ def classifier():
 
     print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
     print('###############')
-
+    """
     ###############################################################################################
 
     print('TF-IDF PERFORMANCE')

@@ -63,7 +63,7 @@ def similarity():
         pickle.dump(ticket_faq_map, fp)
 
     #############################################################################
-
+    """
     print('Loading Doc2Vec Model...')
     model_path = 'embedding/models/doc2vec.model'
     model = Doc2Vec.load(model_path)
@@ -89,7 +89,7 @@ def similarity():
 
     with open("similarity/mappings/ticket_faq_map_doc2vec_cosine.txt", "wb") as fp:
         pickle.dump(ticket_faq_map, fp)
-
+    """
     ###########################################################################
 
     print('Loading TF-IDF Model...')
