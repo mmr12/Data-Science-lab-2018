@@ -1,7 +1,7 @@
 from joblib import dump
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-def tfidf(all_ans, ticket_ans_and_faqs):
+def tfidf(all_ans, ticket_ques_and_faqs):
     vectoriser = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
     # create matrix: rows = all ans; cols = TI-IDF weighted word vector
     vectoriser.fit(all_ans)
@@ -11,5 +11,5 @@ def tfidf(all_ans, ticket_ans_and_faqs):
 
     # TODO: use this for classification?
     vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-    vec2.fit(ticket_ans_and_faqs)
+    vec2.fit(ticket_ques_and_faqs)
     dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')

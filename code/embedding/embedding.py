@@ -33,7 +33,7 @@ def embedding():
     # Model assumption: different embeddings
     all_ans = faq_ans + ticket_ans
     # For the prdclassifier
-    ticket_ans_and_faqs = faq_ans + ticket_ques
+    ticket_ques_and_faqs = faq_ans + ticket_ques
 
     # create a dictionary storing the cut points for the four datasets so we can re-split them after.
     # use like all_docs[id_dict['faq_ques']] to get all faq questions.
