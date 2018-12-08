@@ -23,6 +23,7 @@ def embedding():
     #ticket question
     ticket_ques = list(ticket_dat.question)
     n_ticket_ques = len(ticket_ques)
+    ticket_ids = list(ticket_dat.ticket_id)
     #ticket ans
     ticket_ans = list(ticket_dat.answer)
     n_ticket_ans = len(ticket_ans)
@@ -63,6 +64,10 @@ def embedding():
     with open("embedding/models/doc_data/ticket_ques_prepro.txt", "wb") as fp:
         pickle.dump(ticket_ques_prepro, fp)
 
+    # Also save the ticket_ids so can match with labelled data later
+    with open("embedding/models/doc_data/ticket_ids.txt", "wb") as fp:
+        pickle.dump(ticket_ids, fp)
+
     ############################################
 
     # Model assumption: word2vec
@@ -72,15 +77,15 @@ def embedding():
     ############################################
 
     # Model assumption: doc2vec
-    #document_embedding(all_ans, ticket_ques)
-    #print('Doc2vec training done')
+    document_embedding(all_ans, ticket_ques)
+    print('Doc2vec training done')
 
     #############################################
 
     # Model assumption: TF-IDF
-    #print('Training TF-IDF Model')
-    #tfidf(all_ans, ticket_ques)
-    #print('Trained')
+    print('Training TF-IDF Model')
+    tfidf(all_ans, ticket_ques)
+    print('Trained')
 
 if __name__== "__main__":
     embedding()

@@ -6,7 +6,7 @@ from prediction.predict import predict
 
 if __name__== "__main__" :
 
-    #embedding()
-    #similarity()
+    embedding()
+    similarity()
     classifier()
-    #predict()
+    predict()
