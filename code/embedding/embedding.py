@@ -32,6 +32,8 @@ def embedding():
     all_docs = faq_ques + faq_ans + ticket_ques + ticket_ans
     # Model assumption: different embeddings
     all_ans = faq_ans + ticket_ans
+    # For the prdclassifier
+    ticket_ans_and_faqs = faq_ans + ticket_ques
 
     # create a dictionary storing the cut points for the four datasets so we can re-split them after.
     # use like all_docs[id_dict['faq_ques']] to get all faq questions.
@@ -84,7 +86,7 @@ def embedding():
 
     # Model assumption: TF-IDF
     print('Training TF-IDF Model')
-    tfidf(all_ans, ticket_ques)
+    tfidf(all_ans, ticket_ans_and_faqs)
     print('Trained')
 
 if __name__== "__main__":
