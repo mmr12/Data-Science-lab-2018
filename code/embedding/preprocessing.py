@@ -63,7 +63,7 @@ def preprocess_sentence_fn(s):
                remove_ip,
                remove_email,
                remove_mailto,
-               remove_url,
+               #remove_url,
                lambda x: remove_punc(x, punc_exceptions),
                remove_stopwords,
                lambda x: remove_custom_stopwords(x, custom_stopwords),
