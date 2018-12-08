@@ -2,6 +2,7 @@ import pandas as pd
 from .preprocessing import *
 from .tfidf import *
 from .doc2vec import *
+from .tfidf_w2v import *
 from .word2vec import *
 import pickle
 
@@ -63,13 +64,24 @@ def embedding():
     with open("embedding/models/doc_data/ticket_ques_prepro.txt", "wb") as fp:
         pickle.dump(ticket_ques_prepro, fp)
 
+    all_docs_prepro = preprocess_docs_fn(all_docs)
+    with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
+        pickle.dump(all_docs_prepro, fp)
+
     ############################################
 
     # Model assumption: word2vec
-    word_embedding(all_ans_prepro, ticket_ques_prepro)
+    word_embedding(all_ans_prepro, ticket_ques_prepro, all_docs_prepro)
     print('Word2vec training done')
 
     ############################################
+
+    # Model assumption tfidf + w2v
+    tfidf_w2v(all_ans_prepro, ticket_ques_prepro, all_docs_prepro)
+    print('Tfidf and word2vec training done')
+
+
+    #############################################
 
     # Model assumption: doc2vec
     #document_embedding(all_ans, ticket_ques)

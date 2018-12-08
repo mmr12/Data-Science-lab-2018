@@ -1,6 +1,7 @@
 from .tfidf import *
 from .word2vec import *
 from .doc2vec import *
+from .tfidf_w2v import *
 import pickle
 import numpy as np
 
@@ -25,7 +26,12 @@ def similarity():
     #########################################
 
     #word2vec
-    word_embedding(all_ans_prepro, faq_ans)
+    #word_embedding(all_ans_prepro, faq_ans)
+
+    #########################################
+
+    #tfidf + word2vec
+    tfidf_w2v(all_ans_prepro, faq_ans)
 
     #########################################
 

@@ -1,6 +1,7 @@
 from .word2vec import *
 from .doc2vec import *
 from .tfidf import RF
+from .tfidf_w2v import *
 
 
 # Unpickle the document data, the ticket to FAQ map
@@ -16,6 +17,11 @@ def classifier():
 
     #word2vec
     word_embedding(ticket_ques_prepro)
+
+    ############################
+
+    #tfidf + word2vec
+    tfidf_w2v()
 
     ############################
 
