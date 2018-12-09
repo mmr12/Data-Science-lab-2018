@@ -61,6 +61,8 @@ def embedding(model, data_prefix='../data/12-04-'):
         'ticket_ans': ticket_ans,
         'ticket_val': test_dic["x_val"],
         'ticket_test': test_dic["x_test"],
+        'faq_title': faq_dat.answer_title, # Just used for app
+        'faq_raq_answer': faq_dat.answer # Just used for app
     }
 
     # Run the preprocessing
