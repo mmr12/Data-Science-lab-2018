@@ -1,6 +1,6 @@
 import pickle
 
-from gensim.models import Word2Vec
+from gensim.models import Word2Vec, Doc2Vec
 from joblib import load
 
 from .utils import *
@@ -14,25 +14,27 @@ def test(model, data_prefix='../data/12-08-'):
 
     if model == 'tfidf':
         x = test_dic["x_test"]
-        TFiDF(x, y)
+        TFiDF = load('embedding/models/TF-IFD-ticket-ques.joblib')
+        X_test = TFiDF.transform(x)
+        classifier = load('classifier/models/RF_TFiDF.joblib')
 
     elif model == 'word2vec':
         W2V(y)
 
     elif model == 'doc2vec':
-        D2V(y)
-        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
-            id_dict = pickle.load(fp)
-        document_embedding(id_dict)
+        # load data
+        with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+            test_prepo = pickle.load(fp)
+        # load model
+        model = Doc2Vec.load('embedding/models/' + 'doc2vec_ticket_ques.model')
+        # embed data
+        X_test = np.array([model.infer_vector(test_prepo[i]) for i in range(len(test_prepo))])
+        classifier = load('classifier/models/RF_doc2vec.joblib')
 
     else:
         print('Model {} not found'.format(model))
+        return 0
 
-
-def TFiDF(x, y):
-    TFiDF = load('embedding/models/TF-IFD-ticket-ques.joblib')
-    X_test = TFiDF.transform(x)
-    classifier = load('classifier/models/RF_TFiDF.joblib')
     y_hat = classifier.predict_proba(X_test)
     scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
     print("precision, recall, F1-score", scores)
@@ -50,10 +52,6 @@ def W2V(y):
     y_hat = classifier.predict_proba(X_test)
     scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
     return scores
-
-
-def D2V(y):
-    return 0
 
 
 # word2vec support function

@@ -77,20 +77,29 @@ def embedding(model, data_prefix='../data/12-04-'):
     elif model == 'word2vec':
         word_embedding(all_ans_prepro, ticket_ques_prepro)
     elif model == 'doc2vec':
-        document_embedding(all_ans, ticket_ques)
+        document_embedding(all_ans_prepro, ticket_ques_prepro)
     else:
         print('Model {} not found'.format(model))
 
 def tfidf(all_ans, ticket_ques_and_faqs):
-    vectoriser = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-    # create matrix: rows = all ans; cols = TI-IDF weighted word vector
-    vectoriser.fit(all_ans)
-    dump(vectoriser, 'embedding/models/TF-IFD-ans.joblib')
-    # train model on ans too
+    # ALL ANSWERS
+    exists = os.path.isfile('embedding/models/TF-IFD-ans.joblib')
+    if exists:
+        print('TFiDF ans embedding model already existing')
+    else:
+        vectoriser = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
+        # create matrix: rows = all ans; cols = TI-IDF weighted word vector
+        vectoriser.fit(all_ans)
+        dump(vectoriser, 'embedding/models/TF-IFD-ans.joblib')
 
-    vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
-    vec2.fit(ticket_ques_and_faqs)
-    dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
+    # TICKET QUESTIONS
+    exists = os.path.isfile('embedding/models/TF-IFD-ticket-ques.joblib')
+    if exists:
+        print('TFiDF ques embedding model already existing')
+    else:
+        vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
+        vec2.fit(ticket_ques_and_faqs)
+        dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
 
 def word_embedding(all_ans_prepro, ticket_ques_prepro):
 
@@ -119,7 +128,8 @@ def word_embedding(all_ans_prepro, ticket_ques_prepro):
         word_model = Word2Vec(ticket_ques_prepro, size=128, window=5, min_count=1, workers=4)
         word_model.save(word_path)
 
-def document_embedding(all_ans, ticket_ques):
+
+def document_embedding(all_ans_prepro, ticket_ques_prepro):
 
     #ALL ANSWERS
     # checking if embedding model already exists
@@ -133,19 +143,23 @@ def document_embedding(all_ans, ticket_ques):
         doc_tempfile = get_tmpfile(doc_path)
         # DOC2VEC Model. 1 is distributed memory, 0 is distributed bag of words
         MODEL = 1
-        tagged_docs = [TaggedDocument(doc, [i]) for i, doc in enumerate(all_ans)]
+        tagged_docs = [TaggedDocument(doc, [i]) for i, doc in enumerate(all_ans_prepro)]
         doc_model = Doc2Vec(tagged_docs, vector_size=128, window=5, min_count=1, workers=4, dm=MODEL)
         doc_model.save(doc_path)
 
     #TICKET QUESTIONS
-    print('Training doc2vec on ticket questions')
-    doc_path = "embedding/models/doc2vec_ticket_ques.model"
-    doc_tempfile = get_tmpfile(doc_path)
-    # DOC2VEC Model. 1 is distributed memory, 0 is distributed bag of words
-    MODEL = 1
-    tagged_docs = [TaggedDocument(doc, [i]) for i, doc in enumerate(ticket_ques)]
-    doc_model = Doc2Vec(tagged_docs, vector_size=128, window=5, min_count=1, workers=4, dm=MODEL)
-    doc_model.save(doc_path)
+    exists = os.path.isfile("embedding/models/doc2vec_ticket_ques.model")
+    if exists:
+        print('Doc2vec embedding model on ans already existing')
+    else:
+        print('Training doc2vec on ticket questions')
+        doc_path = "embedding/models/doc2vec_ticket_ques.model"
+        doc_tempfile = get_tmpfile(doc_path)
+        # DOC2VEC Model. 1 is distributed memory, 0 is distributed bag of words
+        MODEL = 1
+        tagged_docs = [TaggedDocument(doc, [i]) for i, doc in enumerate(ticket_ques_prepro)]
+        doc_model = Doc2Vec(tagged_docs, vector_size=128, window=5, min_count=1, workers=4, dm=MODEL)
+        doc_model.save(doc_path)
 
 
 def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_prepro, ticket_ids, val_prepo,
