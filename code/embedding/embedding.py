@@ -1,19 +1,24 @@
-import pandas as pd
-from .preprocessing import *
-import pickle
-from sklearn.feature_extraction.text import TfidfVectorizer
-from gensim.models import Word2Vec
 import os
+import pickle
+
+import pandas as pd
+from gensim.models import Word2Vec
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.test.utils import get_tmpfile
 from joblib import dump
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from .preprocessing import *
 
 
 def embedding(model, data_prefix='../data/12-04-'):
 
     # Read in the data
-    ticket_dat = pd.read_csv(data_prefix + 'ticket_dat.csv')
+    ticket_dat = pd.read_csv(data_prefix + 'train_ticket.csv')
     faq_dat = pd.read_csv(data_prefix + 'faq_dat.csv')
+    with open(data_prefix + 'val-test.pkl', "rb") as fp:
+        test_dic = pickle.load(fp)
+
     # Replace the NaNs
     ticket_dat.fillna('', inplace=True)
     faq_dat.fillna('', inplace=True)
@@ -24,19 +29,20 @@ def embedding(model, data_prefix='../data/12-04-'):
     # FAQ answer
     faq_ans = list(faq_dat.answer_title + " " + faq_dat.answer)
     n_faq_ans = len(faq_ans)
-    #ticket question
+    # ticket question
     ticket_ques = list(ticket_dat.question)
     n_ticket_ques = len(ticket_ques)
     ticket_ids = list(ticket_dat.ticket_id)
-    #ticket ans
+    # ticket ans
     ticket_ans = list(ticket_dat.answer)
     n_ticket_ans = len(ticket_ans)
+
 
     # Model assumption: same embedding for all
     all_docs = faq_ques + faq_ans + ticket_ques + ticket_ans
     # Model assumption: different embeddings
     all_ans = faq_ans + ticket_ans
-    # For the prdclassifier
+    # For the preclassifier
     ticket_ques_and_faqs = faq_ans + ticket_ques
 
     # create a dictionary storing the cut points for the four datasets so we can re-split them after.
@@ -47,17 +53,23 @@ def embedding(model, data_prefix='../data/12-04-'):
         'ticket_ques': range(n_faq_ques + n_faq_ans, n_faq_ques + n_faq_ans + n_ticket_ques),
         'ticket_ans': range(n_faq_ques + n_faq_ans + n_ticket_ques, n_faq_ques + n_faq_ans + n_ticket_ques + n_ticket_ans)
     }
+
     all_docs_sep = {
         'faq_ques': faq_ques,
         'faq_ans': faq_ans,
         'ticket_ques': ticket_ques,
-        'ticket_ans': ticket_ans}
+        'ticket_ans': ticket_ans,
+        'ticket_val': test_dic["x_val"],
+        'ticket_test': test_dic["x_test"],
+    }
 
     # Run the preprocessing
     all_ans_prepro = preprocess_docs_fn(all_ans)
     ticket_ques_prepro = preprocess_docs_fn(ticket_ques)
+    val_prepo = preprocess_docs_fn(test_dic["x_val"])
+    test_prepo = preprocess_docs_fn(test_dic["x_test"])
 
-    dump_documents(all_docs, id_dict, all_docs_sep, all_ans, ticket_ques, ticket_ids)
+    dump_documents(all_docs, id_dict, all_docs_sep, all_ans, ticket_ques, ticket_ids, val_prepo, test_prepo)
 
     # Take model argument and train which ever model is selected
     if model == 'tfidf':
@@ -76,8 +88,6 @@ def tfidf(all_ans, ticket_ques_and_faqs):
     dump(vectoriser, 'embedding/models/TF-IFD-ans.joblib')
     # train model on ans too
 
-
-    # TODO: use this for classification?
     vec2 = TfidfVectorizer(strip_accents='unicode', lowercase=True, analyzer='word')
     vec2.fit(ticket_ques_and_faqs)
     dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
@@ -137,13 +147,17 @@ def document_embedding(all_ans, ticket_ques):
     doc_model = Doc2Vec(tagged_docs, vector_size=128, window=5, min_count=1, workers=4, dm=MODEL)
     doc_model.save(doc_path)
 
-def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_prepro, ticket_ids):
+
+def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_prepro, ticket_ids, val_prepo,
+                   test_prepo):
 
     # Need to save this list and id dictionary as a pickle so we can decode IDs when we test things
     with open("embedding/models/doc_data/all_docs.txt", "wb") as fp:
         pickle.dump(all_docs, fp)
+
     with open("embedding/models/doc_data/id_dict.txt", "wb") as fp:
         pickle.dump(id_dict, fp)
+
     with open("embedding/models/doc_data/all_docs_sep.pkl", "wb") as fp:
         pickle.dump(all_docs_sep, fp)
 
@@ -157,6 +171,12 @@ def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_
     # Also save the ticket_ids so can match with labelled data later
     with open("embedding/models/doc_data/ticket_ids.txt", "wb") as fp:
         pickle.dump(ticket_ids, fp)
+
+    with open("embedding/models/doc_data/ticket_val.txt", "wb") as fp:
+        pickle.dump(val_prepo, fp)
+
+    with open("embedding/models/doc_data/ticket_test.txt", "wb") as fp:
+        pickle.dump(test_prepo, fp)
 
 
 if __name__== "__main__":

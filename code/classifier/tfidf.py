@@ -1,9 +1,10 @@
 import pickle
-import numpy as np
+
 from joblib import load, dump
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.model_selection import cross_val_score
+
+from .utils import *
 
 
 def RF():
@@ -30,10 +31,13 @@ def RF():
     # print(matrix.shape, mapping.shape)
 
     RF = RandomForestClassifier()
-    scores = cross_val_score(RF, matrix, mapping, cv=5)
-    cv_score = scores.mean()
+    print('Running CV on Classifier...')
+    cv_score = cross_val_proba_score(RF, matrix, mapping, scoring=multilabel_prec, scoring_arg1=99, scoring_arg2=5,
+                                     n_splits=5)
+    # scores = cross_val_score(RF, matrix, mapping, cv=5)
+    # cv_score = scores.mean()
 
-    print('CV score on RF ', round(cv_score, 4))
+    print('CV score on RF ', np.around(cv_score, 4))
 
     # save model
     RF_final = RandomForestClassifier()
@@ -83,4 +87,4 @@ def nn_classifier():
 
 
 if __name__ == "__main__":
-    classifier()
+    RF()
