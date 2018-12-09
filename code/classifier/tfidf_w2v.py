@@ -1,11 +1,11 @@
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.model_selection import cross_val_score
 import pickle
 import numpy as np
 from .utils import *
 from joblib import dump
 from gensim.models import Word2Vec
+from gensim.corpora import Dictionary
+from gensim.models import TfidfModel
 
 def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
     if dat == 'faq_ans':
@@ -71,11 +71,12 @@ def tfidf_w2v(all_docs_prepro, id_dict):
     model_path = 'embedding/models/word2vec_all.model'
     model_w2v = Word2Vec.load(model_path)
 
-    print('Loading Word2vec model')
+    print('Loading Tfidf model')
     model_path = 'embedding/models/tfidf_all.model'
-    model_tfidf = Word2Vec.load(model_path)
+    model_tfidf = TfidfModel.load(model_path)
 
-    dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro
+    dct = Dictionary(all_docs_prepro)
+    corpus = [dct.doc2bow(line) for line in all_docs_prepro]
 
     mean_ticket_ques = all_average('ticket_ques', corpus=corpus, dct=dct, model_w2v=model_w2v,
                                    model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)

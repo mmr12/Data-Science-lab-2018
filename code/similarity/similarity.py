@@ -6,6 +6,7 @@ from gensim.models.doc2vec import Doc2Vec
 from joblib import load
 from sklearn.metrics.pairwise import cosine_similarity
 from gensim.corpora import Dictionary
+from gensim.models import TfidfModel
 
 from .utils import *
 
@@ -49,7 +50,7 @@ def similarity(model, thresh):
     elif model == 'word2vec':
         word_embedding(all_docs_prepro, id_dict, thresh)
     elif model == 'tfidf_w2v':
-        tfidf_w2v(all_docs_prepro, id_dict)
+        tfidf_w2v(all_docs_prepro, id_dict, thresh)
     elif model == 'doc2vec':
         document_embedding(all_faq_ans, ticket_ans_ids, thresh)
     else:
@@ -109,7 +110,7 @@ def word_embedding(all_docs_prepro, id_dict, thresh):
     with open("similarity/mappings/ticket_faq_map_word2vec.pkl", "wb") as fp:
         pickle.dump(output, fp)
 
-def tfidf_w2v(all_docs_prepro, id_dict):
+def tfidf_w2v(all_docs_prepro, id_dict, thresh):
 
     print('Loading Word2vec model')
     model_path = 'embedding/models/word2vec_all.model'
@@ -117,16 +118,17 @@ def tfidf_w2v(all_docs_prepro, id_dict):
 
     print('Loading Word2vec model')
     model_path = 'embedding/models/tfidf_all.model'
-    model_tfidf = Word2Vec.load(model_path)
+    model_tfidf = TfidfModel.load(model_path)
 
     dct = Dictionary(all_docs_prepro)
     corpus = [dct.doc2bow(line) for line in all_docs_prepro]
 
     mean_ticket_ans = all_average(dat='ticket_ans', corpus=corpus, dct=dct, model_w2v=model_w2v,
                                   model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
-    mean_faq_ans = all_average(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf)
+    mean_faq_ans = all_average(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf,
+                               id_dict=id_dict, all_docs_prepro=all_docs_prepro)
 
-    output = compute_sim(mean_ticket_ans, mean_faq_ans)
+    output = compute_sim(mean_ticket_ans, mean_faq_ans, thresh=thresh)
 
     with open("../code/similarity/mappings/map_w2v_tfidf_all.pkl", "wb") as fp:
         pickle.dump(output, fp)
@@ -162,4 +164,4 @@ def document_embedding(all_faq_ans, ticket_ans_ids, thresh):
 
 if __name__== "__main__":
     # TODO: allow command line arguments or something
-    similarity('word2vec', 0.5)
+    similarity('tfidf_w2v', 0.5)
