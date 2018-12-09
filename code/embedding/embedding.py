@@ -66,18 +66,20 @@ def embedding(model, data_prefix='../data/12-04-'):
     }
 
     # Run the preprocessing
+    all_docs_prepro = preprocess_docs_fn(all_docs)
     all_ans_prepro = preprocess_docs_fn(all_ans)
     ticket_ques_prepro = preprocess_docs_fn(ticket_ques)
     val_prepo = preprocess_docs_fn(test_dic["x_val"])
     test_prepo = preprocess_docs_fn(test_dic["x_test"])
 
-    dump_documents(all_docs, id_dict, all_docs_sep, all_ans, ticket_ques, ticket_ids, val_prepo, test_prepo)
+    dump_documents(all_docs, id_dict, all_docs_sep, all_ans, ticket_ques, ticket_ids, val_prepo, test_prepo,
+                   all_docs_prepro)
 
     # Take model argument and train which ever model is selected
     if model == 'tfidf':
         tfidf(all_ans, ticket_ques_and_faqs)
     elif model == 'word2vec':
-        word_embedding(all_ans_prepro, ticket_ques_prepro)
+        word_embedding(all_docs_prepro)
     elif model == 'doc2vec':
         document_embedding(all_ans, ticket_ques)
     else:
@@ -138,7 +140,7 @@ def document_embedding(all_ans, ticket_ques):
 
 
 def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_prepro, ticket_ids, val_prepo,
-                   test_prepo):
+                   test_prepo, all_docs_prepro):
 
     # Need to save this list and id dictionary as a pickle so we can decode IDs when we test things
     with open("embedding/models/doc_data/all_docs.txt", "wb") as fp:
@@ -166,6 +168,9 @@ def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_
 
     with open("embedding/models/doc_data/ticket_test.txt", "wb") as fp:
         pickle.dump(test_prepo, fp)
+
+    with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
+        pickle.dump(all_docs_prepro, fp)
 
 
 if __name__== "__main__":

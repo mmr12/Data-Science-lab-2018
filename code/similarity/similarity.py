@@ -31,6 +31,10 @@ def similarity(model, thresh):
     with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
         test_prepo = pickle.load(fp)
 
+    with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+        all_docs_prepro = pickle.load(fp)
+        print('Loaded All Answers')
+
     print('Loading Completed')
 
     ticket_ans_ids = np.array(id_dict['ticket_ans'])
@@ -42,7 +46,7 @@ def similarity(model, thresh):
     if model == 'tfidf':
         tfidf(faq_ans, ticket_ans, thresh)
     elif model == 'word2vec':
-        word_embedding(all_ans_prepro, faq_ans, thresh)
+        word_embedding(all_docs_prepro, id_dict, thresh)
     elif model == 'doc2vec':
         document_embedding(all_faq_ans, ticket_ans_ids, thresh)
     else:
@@ -85,18 +89,19 @@ def tfidf(faq_ans, ticket_ans, thresh):
         pickle.dump(output, fp)
 
 
-def word_embedding(all_docs_prepro, thresh, id_dict):
+def word_embedding(all_docs_prepro, id_dict, thresh):
     print('Loading Word2vec model')
     model_path = 'embedding/models/word2vec_all.model'
     model = Word2Vec.load(model_path)
 
     print('Computing word2vec similarity')
     #create doc vector for tickets answers i.e. average over each ticket ans the word2vec vector for each word
-    mean_ticket_ans = doc_emb_one('ticket_ans', id_dict, all_docs_prepro, model)
+    mean_ticket_ans = doc_emb_one(name='ticket_ans', id_dict=id_dict, all_docs_prepro=all_docs_prepro,
+                                  model=model)
     #create doc vector for faq ans i.e. average over each faq ans the word2vec vector for each word
-    mean_faq_ans = doc_emb_one('faq_ans', id_dict, all_docs_prepro, model)
+    mean_faq_ans = doc_emb_one(name='faq_ans', id_dict=id_dict, all_docs_prepro=all_docs_prepro, model=model)
 
-    output = compute_sim(mean_ticket_ans=mean_ticket_ans, mean_faq_ans=mean_faq_ans)
+    output = compute_sim(mean_ticket_ans=mean_ticket_ans, mean_faq_ans=mean_faq_ans, thresh=thresh)
 
     with open("similarity/mappings/ticket_faq_map_word2vec.pkl", "wb") as fp:
         pickle.dump(output, fp)

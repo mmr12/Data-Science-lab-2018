@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 #   1: precision
 #   2: recall
 #  99: precision, recall, F1-score
-def multilabel_prec(y, y_pred_proba, what_to_predict=1, nvals=5):
+def multilabel_prec(y, y_pred_proba, what_to_predict=99, nvals=5):
     y_preds = np.argsort(y_pred_proba, axis=1)[:, -nvals:]
     TP = np.sum([is_in(y_preds[i, :], y[i]) for i in range(len(y))])
     FP = [np.sum([is_in(y_preds[i, :], j) for i in range(len(y))]) for j in range(len(y))]
