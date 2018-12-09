@@ -61,6 +61,8 @@ def embedding(model, data_prefix='../data/12-04-'):
         'ticket_ans': ticket_ans,
         'ticket_val': test_dic["x_val"],
         'ticket_test': test_dic["x_test"],
+        'faq_title': faq_dat.answer_title, # Just used for app
+        'faq_raq_answer': faq_dat.answer # Just used for app
     }
 
     # Run the preprocessing
@@ -101,31 +103,18 @@ def tfidf(all_ans, ticket_ques_and_faqs):
         vec2.fit(ticket_ques_and_faqs)
         dump(vec2, 'embedding/models/TF-IFD-ticket-ques.joblib')
 
-def word_embedding(all_ans_prepro, ticket_ques_prepro):
+def word_embedding(all_docs_prepro):
 
-    #ALL ANSWERS
     # checking if embedding model already exists
-    exists = os.path.isfile('embedding/models/word2vec_ans.model')
+    exists = os.path.isfile('embedding/models/word2vec_all.model')
     if exists:
         print('Word2vec embedding model already existing')
     # Create word embedding model
     else:
         print('Training word2vec on all answers')
-        word_path = "embedding/models/word2vec_ans.model"
+        word_path = "embedding/models/word2vec_all.model"
         word_tempfile = get_tmpfile(word_path)
-        word_model = Word2Vec(all_ans_prepro, size=128, window=5, min_count=1, workers=4)
-        word_model.save(word_path)
-
-    #TICKET QUESTIONS
-    exists = os.path.isfile('embedding/models/word2vec_ticket_ques.model')
-    if exists:
-        print('Word2vec embedding model already existing')
-    else:
-        #not checking if already exists because if the first doesn't this won't either
-        print('Training word2vec on ticket questions')
-        word_path = "embedding/models/word2vec_ticket_ques.model"
-        word_tempfile = get_tmpfile(word_path)
-        word_model = Word2Vec(ticket_ques_prepro, size=128, window=5, min_count=1, workers=4)
+        word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=4)
         word_model.save(word_path)
 
 
@@ -133,7 +122,7 @@ def document_embedding(all_ans_prepro, ticket_ques_prepro):
 
     #ALL ANSWERS
     # checking if embedding model already exists
-    exists = os.path.isfile('embedding/models/doc2vec_ans.model')
+    exists = os.path.isfile('embedding/models/doc2vec_all.model')
     if exists:
         print('Doc2vec embedding model already existing')
     # Create Doc2Vec model in case it doesn't exists
@@ -195,4 +184,4 @@ def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_
 
 if __name__== "__main__":
     # TODO: allow argument passing
-    embedding('tfidf', '../data/12-04-')
+    embedding('word2vec', '../data/12-04-')
