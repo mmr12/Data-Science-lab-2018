@@ -17,3 +17,8 @@ if __name__== "__main__" :
 
     # predict()
     # test(MODEL, data_prefix=DATA_PREFIX)
+
+    # TODO: test(doc2vec) outputs scores (nan, 0.0, nan)
+    # TODO: link test and word2vec
+    # TODO: (future) link tfidf_w2v with test
+    # TODO: mirror test with validate
