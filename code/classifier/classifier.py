@@ -10,9 +10,11 @@ def classifier(model):
         RF()
 
     elif model == 'word2vec':
-        with open("embedding/models/doc_data/ticket_ques_prepro.txt", "rb") as fp:
-            ticket_ques_prepro = pickle.load(fp)
-        word_embedding(ticket_ques_prepro)
+        with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+            all_docs_prepro = pickle.load(fp)
+        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
+            id_dict = pickle.load(fp)
+        word_embedding(all_docs_prepro, id_dict)
 
     elif model == 'doc2vec':
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
