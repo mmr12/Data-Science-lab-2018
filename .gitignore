@@ -235,9 +235,12 @@ data/
 */models/
 */models/doc_data/
 */mappings/
+*/doc_data/
+*/doc_data
 
 # avoid .joblib
 *.joblib
 
 # MR: somehow this file is preventing me from pulling:
 *.pkl
+*.txt
