@@ -5,7 +5,7 @@ from similarity.similarity import similarity
 
 MODEL = 'word2vec'
 SIM_THRESH = 0.2
-DATA_PREFIX = '../data/12-04-'
+DATA_PREFIX = '../data/12-08-'
 CLASS_TYPE = 'cv'  # 'cv', 'val', 'test'
 
 if __name__== "__main__" :

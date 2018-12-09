@@ -7,6 +7,8 @@ from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 from gensim.test.utils import get_tmpfile
 from joblib import dump
 from sklearn.feature_extraction.text import TfidfVectorizer
+from gensim.models import TfidfModel
+from gensim.corpora import Dictionary
 
 from .preprocessing import *
 
@@ -66,18 +68,22 @@ def embedding(model, data_prefix='../data/12-04-'):
     }
 
     # Run the preprocessing
+    all_docs_prepro = preprocess_docs_fn(all_docs)
     all_ans_prepro = preprocess_docs_fn(all_ans)
     ticket_ques_prepro = preprocess_docs_fn(ticket_ques)
     val_prepo = preprocess_docs_fn(test_dic["x_val"])
     test_prepo = preprocess_docs_fn(test_dic["x_test"])
 
-    dump_documents(all_docs, id_dict, all_docs_sep, all_ans, ticket_ques, ticket_ids, val_prepo, test_prepo)
+    dump_documents(all_docs, id_dict, all_docs_sep, all_ans, ticket_ques, ticket_ids, val_prepo, test_prepo,
+                   all_docs_prepro)
 
     # Take model argument and train which ever model is selected
     if model == 'tfidf':
         tfidf(all_ans, ticket_ques_and_faqs)
     elif model == 'word2vec':
-        word_embedding(all_ans_prepro, ticket_ques_prepro)
+        word_embedding(all_docs_prepro)
+    elif model == 'tfidf_w2v':
+        tfidf_w2v(all_docs_prepro)
     elif model == 'doc2vec':
         document_embedding(all_ans_prepro, ticket_ques_prepro)
     else:
@@ -110,6 +116,30 @@ def word_embedding(all_docs_prepro):
     if exists:
         print('Word2vec embedding model already existing')
     # Create word embedding model
+    else:
+        print('Training word2vec on all answers')
+        word_path = "embedding/models/word2vec_all.model"
+        word_tempfile = get_tmpfile(word_path)
+        word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=4)
+        word_model.save(word_path)
+
+def tfidf_w2v(all_docs_prepro):
+
+    #TFIDF MODEL
+    exists = os.path.isfile('embedding/models/tfidf_all.model')
+    if exists:
+        print('Tfidf embedding model already existing')
+    else:
+        dct = Dictionary(all_docs_prepro)  # fit dictionary
+        corpus = [dct.doc2bow(line) for line in all_docs_prepro]  # convert corpus to BoW format
+        model_tfidf = TfidfModel(corpus)
+        word_path = 'embedding/models/tfidf_all.model'
+        model_tfidf.save(word_path)
+
+    #WORD2VEC MODEL
+    exists = os.path.isfile('embedding/models/word2vec_all.model')
+    if exists:
+        print('Word2vec embedding model already existing')
     else:
         print('Training word2vec on all answers')
         word_path = "embedding/models/word2vec_all.model"
@@ -152,7 +182,7 @@ def document_embedding(all_ans_prepro, ticket_ques_prepro):
 
 
 def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_prepro, ticket_ids, val_prepo,
-                   test_prepo):
+                   test_prepo, all_docs_prepro):
 
     # Need to save this list and id dictionary as a pickle so we can decode IDs when we test things
     with open("embedding/models/doc_data/all_docs.txt", "wb") as fp:
@@ -180,6 +210,9 @@ def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_
 
     with open("embedding/models/doc_data/ticket_test.txt", "wb") as fp:
         pickle.dump(test_prepo, fp)
+
+    with open("embedding/models/doc_data/all_docs_prepro.txt", "wb") as fp:
+        pickle.dump(all_docs_prepro, fp)
 
 
 if __name__== "__main__":

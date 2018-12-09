@@ -61,6 +61,6 @@ def word_embedding(all_docs_prepro, id_dict):
 
     mapping = Classes['mapping']
 
-    ticket_question_embeddings = doc_emb_one('ticket_ques_prepro',id_dict, all_docs_prepro, model)
+    ticket_question_embeddings = doc_emb_one('ticket_ques', id_dict, all_docs_prepro, model)
 
     classification(ticket_question_embeddings, mapping)

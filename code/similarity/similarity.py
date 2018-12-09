@@ -5,6 +5,7 @@ from gensim.models import Word2Vec
 from gensim.models.doc2vec import Doc2Vec
 from joblib import load
 from sklearn.metrics.pairwise import cosine_similarity
+from gensim.corpora import Dictionary
 
 from .utils import *
 
@@ -31,6 +32,10 @@ def similarity(model, thresh):
     with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
         test_prepo = pickle.load(fp)
 
+    with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+        all_docs_prepro = pickle.load(fp)
+        print('Loaded All Answers')
+
     print('Loading Completed')
 
     ticket_ans_ids = np.array(id_dict['ticket_ans'])
@@ -44,7 +49,9 @@ def similarity(model, thresh):
     if model == 'tfidf':
         tfidf(faq_ans, ticket_ans, thresh)
     elif model == 'word2vec':
-        word_embedding(all_ans_prepro, faq_ans, thresh)
+        word_embedding(all_docs_prepro, id_dict, thresh)
+    elif model == 'tfidf_w2v':
+        tfidf_w2v(all_docs_prepro, id_dict)
     elif model == 'doc2vec':
         document_embedding(n_faq, n_ticket, thresh)
     else:
@@ -67,70 +74,43 @@ def tfidf(faq_ans, ticket_ans, thresh):
         pickle.dump(output, fp)
 
 
-def word_embedding(all_docs_prepro, thresh, id_dict):
+def word_embedding(all_docs_prepro, id_dict, thresh):
     print('Loading Word2vec model')
     model_path = 'embedding/models/word2vec_all.model'
     model = Word2Vec.load(model_path)
 
-    # model has been trained on nfaq + ntickets
-
-    def doc_emb(dat):
-        mean_ans = np.empty((len(dat), 128), dtype=float)
-        for j in range(len(dat)):
-            sentence = dat[j]
-            words = np.empty((len(sentence), 128), dtype=float)
-            for i in range(len(sentence)):
-                words[i] = model[sentence[i]]
-            mean_ans[j] = np.apply_along_axis(np.mean, 0, words)
-        return mean_ans
-
     print('Computing word2vec similarity')
     #create doc vector for tickets answers i.e. average over each ticket ans the word2vec vector for each word
-    mean_ticket_ans = doc_emb_one('ticket_ans', id_dict, all_docs_prepro, model)
+    mean_ticket_ans = doc_emb_one(name='ticket_ans', id_dict=id_dict, all_docs_prepro=all_docs_prepro,
+                                  model=model)
     #create doc vector for faq ans i.e. average over each faq ans the word2vec vector for each word
-    mean_faq_ans = doc_emb_one('faq_ans', id_dict, all_docs_prepro, model)
-    # create doc vector for tickets answers i.e. average over each ticket ans the word2vec vector for each word
-    mean_ticket_ans = doc_emb(all_ans_prepro[len(faq_ans):len(all_ans_prepro)])
-    # create doc vector for faq ans i.e. average over each faq ans the word2vec vector for each word
-    mean_faq_ans = doc_emb(all_ans_prepro[0:len(faq_ans)])
+    mean_faq_ans = doc_emb_one(name='faq_ans', id_dict=id_dict, all_docs_prepro=all_docs_prepro, model=model)
 
-    # create matrix with cosine distances from all ticket ans to all faq ans
-    sim_matrix = cosine_similarity(mean_faq_ans, mean_ticket_ans)
-
-    similarities(sim_matrix, thresh)
+    output = compute_sim(mean_ticket_ans=mean_ticket_ans, mean_faq_ans=mean_faq_ans, thresh=thresh)
 
     with open("similarity/mappings/ticket_faq_map_word2vec.pkl", "wb") as fp:
         pickle.dump(output, fp)
 
+def tfidf_w2v(all_docs_prepro, id_dict):
 
-def document_embedding(n_faq, n_ticket, thresh):
-    print('Loading Doc2Vec Model...')
-    print('FIXED by MR - contact her if this stops working close to 09Dec')
-    model_path = 'embedding/models/doc2vec_ans.model'
-    model = Doc2Vec.load(model_path)
+    print('Loading Word2vec model')
+    model_path = 'embedding/models/word2vec_all.model'
+    model_w2v = Word2Vec.load(model_path)
 
-    # new strategy
-    faq_em = np.array([model.docvecs[i] for i in range(n_faq)])
-    ticket_em = np.array([model.docvecs[i] for i in range(n_faq, n_faq + n_ticket)])
-    sim_matrix = cosine_similarity(faq_em, ticket_em)
+    print('Loading Word2vec model')
+    model_path = 'embedding/models/tfidf_all.model'
+    model_tfidf = Word2Vec.load(model_path)
 
-    similarities(sim_matrix, thresh)
+    dct = Dictionary(all_docs_prepro)
+    corpus = [dct.doc2bow(line) for line in all_docs_prepro]
 
-    with open("similarity/mappings/ticket_faq_map_doc2vec.txt", "wb") as fp:
-        pickle.dump(output, fp)
+    mean_ticket_ans = all_average(dat='ticket_ans', corpus=corpus, dct=dct, model_w2v=model_w2v,
+                                  model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
+    mean_faq_ans = all_average(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf)
 
+    output = compute_sim(mean_ticket_ans, mean_faq_ans)
 
-def similarities(sim_matrix, thresh):
-    # mapping
-    FAQ_per_ticket = np.argmax(sim_matrix, axis=0)
-    strength_FAQ_ticket = np.max(sim_matrix, axis=0)
-
-    # assign weak mappings to -1
-    FAQ_per_ticket[strength_FAQ_ticket < thresh] = -1
-
-    output = compute_sim(mean_ticket_ans=mean_ticket_ans, mean_faq_ans=mean_faq_ans)
-
-    with open("similarity/mappings/ticket_faq_map_word2vec.pkl", "wb") as fp:
+    with open("../code/similarity/mappings/map_w2v_tfidf_all.pkl", "wb") as fp:
         pickle.dump(output, fp)
 
 
@@ -160,21 +140,6 @@ def document_embedding(all_faq_ans, ticket_ans_ids, thresh):
 
     with open("similarity/mappings/ticket_faq_map_doc2vec.txt", "wb") as fp:
         pickle.dump(ticket_faq_map, fp)
-    # some stats
-    n_unique = len(np.unique(FAQ_per_ticket))
-    n_nonassigned = np.shape(FAQ_per_ticket[strength_FAQ_ticket < thresh])[0]
-    n_tickets = len(FAQ_per_ticket)
-
-    # How many tickets each FAQ is assigned
-    counts_per_faq = pd.Series(FAQ_per_ticket).value_counts()
-    # print(counts_per_faq)
-
-    output = {
-        'classes': n_tickets,
-        'mapping': FAQ_per_ticket
-    }
-    print(n_unique, 'classes, with ', round(n_nonassigned / n_tickets, 2), '% non assigned tickets')
-    return output
 
 
 if __name__== "__main__":
