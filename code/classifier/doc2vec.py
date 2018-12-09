@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score
+from joblib import dump
+
 
 def document_embedding(id_dict):
 
@@ -32,6 +34,7 @@ def document_embedding(id_dict):
     classifier_CV = RandomForestClassifier()
     scores = cross_val_score(classifier_CV, ticket_question_embeddings, ticket_faq_map, cv=5)
     cv_score = scores.mean()
+    dump(classifier, 'classifier/models/RF_doc2vec.joblib')
 
     # Some classes only appear once maybe we should assign them a -1
 

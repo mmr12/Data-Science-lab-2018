@@ -12,4 +12,4 @@ if __name__== "__main__" :
     embedding(model=MODEL, data_prefix=DATA_PREFIX)
     similarity(model=MODEL, thresh=SIM_THRESH)
     classifier(model=MODEL)
-    predict()
+    #predict() # TODO: fix (/replace) this
