@@ -3,11 +3,54 @@ import pickle
 from gensim.models import Word2Vec
 from joblib import dump
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 
 from .utils import *
 
+def doc_emb_one(name, id_dict, all_docs_prepro, model):
+    mean_ans = np.empty((len(id_dict[name]), 128), dtype=float)
+    for j in id_dict[name]:
+        sentence = all_docs_prepro[j]
+        words = np.empty((len(sentence), 128), dtype=float)
+        for i in range(len(sentence)):
+            words[i] = model[sentence[i]]
+        mean_ans[j - id_dict[name][0]] = np.apply_along_axis(np.mean, 0, words)
+    return mean_ans
 
-def word_embedding(ticket_ques_prepro):
+
+def classification(mean_ticket_ques, mapping):
+    # RANDOM FOREST CLASSIFIER
+    print('RANDOM FOREST CLASSIFIER')
+    print('Running CV on Classifier...')
+    classifier_CV = RandomForestClassifier()
+    cv_score = cross_val_proba_score(classifier_CV, mean_ticket_ques, mapping,
+                                     scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5)
+    #scores = cross_val_score(classifier_CV, mean_ticket_ques, mapping, cv=5)
+    #cv_score = scores.mean()
+    print('Training Classifier...')
+    classifier = RandomForestClassifier()
+    classifier.fit(X=mean_ticket_ques, y=mapping)
+    y_pred_proba = classifier.predict_proba(mean_ticket_ques)
+    dump(classifier, 'classifier/models/RF_word2vec.joblib')
+    train_score = multilabel_prec(y=mapping, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
+    #train_score = classifier.score(X=mean_ticket_ques, y=mapping)
+    print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
+
+    '''
+    print('GRADIENT BOOSTING CLASSIEIR')
+    print('Running CV on Classifier...')
+    Bclassifier_CV = GradientBoostingClassifier()
+    scores = cross_val_score(Bclassifier_CV, mean_ticket_ques, mapping, cv=5)
+    cv_score = scores.mean()
+    print('Training Classifier...')
+    Bclassifier = GradientBoostingClassifier()
+    Bclassifier.fit(X=mean_ticket_ques, y=mapping)
+    # dump(classifier, 'classifier/models/RF_word2vec.joblib')
+    train_score = Bclassifier.score(X=mean_ticket_ques, y=mapping)
+    print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
+    '''
+
+def word_embedding(all_docs_prepro, id_dict):
 
     # Load the Word2Vec model
     model_path = 'embedding/models/word2vec_ticket_ques.model'
@@ -18,32 +61,6 @@ def word_embedding(ticket_ques_prepro):
 
     mapping = Classes['mapping']
 
-    def doc_emb(dat):
-        mean_ans = np.empty((len(dat), 128), dtype=float)
-        for j in range(len(dat)):
-            sentence = dat[j]
-            words = np.empty((len(sentence), 128), dtype=float)
-            for i in range(len(sentence)):
-                words[i] = model[sentence[i]]
-            mean_ans[j] = np.apply_along_axis(np.mean, 0, words)
-        return mean_ans
+    ticket_question_embeddings = doc_emb_one('ticket_ques_prepro',id_dict, all_docs_prepro, model)
 
-    ticket_question_embeddings = doc_emb(ticket_ques_prepro)
-
-    print('Running CV on Classifier...')
-    classifier_CV = RandomForestClassifier()
-    cv_score = cross_val_proba_score(classifier_CV, ticket_question_embeddings, mapping,
-                                     scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5)
-    # scores = cross_val_score(classifier_CV, ticket_question_embeddings, mapping, cv=5)
-    # cv_score = scores.mean()
-
-    print('Training Classifier...')
-    classifier = RandomForestClassifier()
-    classifier.fit(X=ticket_question_embeddings, y=mapping)
-    dump(classifier, 'classifier/models/RF_word2vec.joblib')
-    y_pred_proba = classifier.predict_proba(ticket_question_embeddings)
-    train_score = multilabel_prec(y=mapping, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
-    #train_score = classifier.score(X=ticket_question_embeddings, y=mapping)
-
-    print('Training Score: {0} \n Cross Val Score: {1}'.format(train_score, cv_score))
-    print('###############')
+    classification(ticket_question_embeddings, mapping)
