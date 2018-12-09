@@ -1,10 +1,15 @@
-from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import pickle
-import numpy as np
+
 import pandas as pd
+from gensim.models.doc2vec import Doc2Vec
 from sklearn.ensemble import RandomForestClassifier
+<<<<<<< HEAD
 from sklearn.model_selection import cross_val_score
 from joblib import dump
+=======
+
+from .utils import *
+>>>>>>> 0f721ebb23ca094f026abf89f3957bce9a078c55
 
 
 def document_embedding(id_dict):
@@ -28,13 +33,22 @@ def document_embedding(id_dict):
     print('Training Classifier...')
     classifier = RandomForestClassifier()
     classifier.fit(X=ticket_question_embeddings, y=ticket_faq_map)
-    train_score = classifier.score(X=ticket_question_embeddings, y=ticket_faq_map)
+    # train_score = classifier.score(X=ticket_question_embeddings, y=ticket_faq_map)
+    y_pred_proba = classifier.predict_proba(ticket_question_embeddings)
+    train_score = multilabel_prec(y=ticket_faq_map, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
 
     print('Running CV on Classifier...')
     classifier_CV = RandomForestClassifier()
+<<<<<<< HEAD
     scores = cross_val_score(classifier_CV, ticket_question_embeddings, ticket_faq_map, cv=5)
     cv_score = scores.mean()
     dump(classifier, 'classifier/models/RF_doc2vec.joblib')
+=======
+    cv_score = cross_val_proba_score(classifier_CV, ticket_question_embeddings, ticket_faq_map,
+                                     scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5)
+    # scores = cross_val_score(classifier_CV, ticket_question_embeddings, ticket_faq_map, cv=5)
+    # cv_score = scores.mean()
+>>>>>>> 0f721ebb23ca094f026abf89f3957bce9a078c55
 
     # Some classes only appear once maybe we should assign them a -1
 
