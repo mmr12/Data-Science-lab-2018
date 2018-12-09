@@ -1,27 +1,20 @@
-from joblib import dump
-from sklearn.ensemble import RandomForestClassifier
-
 from .doc2vec import *
 from .tfidf import RF
 from .word2vec import *
 
 
 # Unpickle the document data, the ticket to FAQ map
-def classifier(model):
+def classifier(model, scoring=1, n_FAQs=5):
     # get embeddings
     if model == 'tfidf':
         X_train, y_train = RF()
 
     elif model == 'word2vec':
-        with open("embedding/models/doc_data/ticket_ques_prepro.txt", "rb") as fp:
-            ticket_ques_prepro = pickle.load(fp)
-
-        X_train, y_train = word_embedding(ticket_ques_prepro)
         with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
             all_docs_prepro = pickle.load(fp)
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
             id_dict = pickle.load(fp)
-        word_embedding(all_docs_prepro, id_dict)
+        X_train, y_train = word_embedding(all_docs_prepro, id_dict)
 
     elif model == 'doc2vec':
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
@@ -40,7 +33,10 @@ def classifier(model):
     print('Running CV on Classifier...')
     classifier_CV = RandomForestClassifier()
     cv_score = cross_val_proba_score(classifier_CV, X_train, y_train,
-                                     scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5)
+                                     scoring=multilabel_prec,
+                                     scoring_arg1=scoring,
+                                     scoring_arg2=n_FAQs,
+                                     n_splits=5)
 
     print('Cross Val Score: {0}'.format(cv_score))
 

@@ -1,6 +1,7 @@
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 # compute sentence embedding for word2vec
 def doc_emb_one(name, id_dict, all_docs_prepro, model):
@@ -39,7 +40,7 @@ def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prep
 
 # compute similarity automatically
 def compute_sim(mean_ticket_ans, mean_faq_ans, thresh):
-    print('Computing word2vec similarity')
+    print('Computing similarity')
 
     # create matrix with cosine distances from all ticket ans to all faq ans
     sim_matrix = cosine_similarity(mean_faq_ans, mean_ticket_ans)
