@@ -23,9 +23,9 @@ def multilabel_prec(y, y_pred_proba, what_to_predict=1, nvals=5):
     if what_to_predict == 0:
         return F1
     elif what_to_predict == 1:
-        return precision
+        return precision, prec
     elif what_to_predict == 2:
-        return recall
+        return recall, rec
     elif what_to_predict == 99:
         return precision, recall, F1
 

@@ -1,25 +1,34 @@
 import pickle
+
 import numpy as np
-from gensim.models import Word2Vec
-from sklearn.metrics.pairwise import cosine_similarity
-from joblib import load
-from gensim.models.doc2vec import Doc2Vec
 import pandas as pd
+from gensim.models import Word2Vec
+from gensim.models.doc2vec import Doc2Vec
+from joblib import load
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 def similarity(model, thresh):
 
     print('Loading Document Data...')
+
     with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
         id_dict = pickle.load(fp)
         print('Loaded Id Dict')
-    # Unpickle the document data
+
     with open("embedding/models/doc_data/all_ans_prepro.txt", "rb") as fp:
         all_ans_prepro = pickle.load(fp)
         print('Loaded All Answers')
+
     with open("embedding/models/doc_data/all_docs_sep.pkl", "rb") as fp:
         all_docs_sep = pickle.load(fp)
         print('Loaded Seperated Answers')
+
+    with open("embedding/models/doc_data/ticket_val.txt", "rb") as fp:
+        val_prepo = pickle.load(fp)
+
+    with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+        test_prepo = pickle.load(fp)
 
     print('Loading Completed')
 
@@ -54,16 +63,16 @@ def tfidf(faq_ans, ticket_ans, thresh):
     strength_FAQ_ticket = np.max(sim_matrix, axis=0)
 
     # assign weak mappings to -1
-    thres = 0.2
     FAQ_per_ticket[strength_FAQ_ticket < thresh] = -1
 
     # some stats
     n_unique = len(np.unique(FAQ_per_ticket))
     n_nonassigned = np.shape(FAQ_per_ticket[strength_FAQ_ticket < thresh])[0]
     n_tickets = len(FAQ_per_ticket)
+
     # How many tickets each FAQ is assigned
     counts_per_faq = pd.Series(FAQ_per_ticket).value_counts()
-    print(counts_per_faq)
+    # print(counts_per_faq)
 
     output = {
         'classes': n_tickets,

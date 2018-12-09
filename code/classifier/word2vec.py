@@ -1,9 +1,11 @@
+import pickle
+
 from gensim.models import Word2Vec
 from joblib import dump
-import pickle
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import cross_val_score
+
+from .utils import *
+
 
 def word_embedding(ticket_ques_prepro):
 
@@ -30,14 +32,18 @@ def word_embedding(ticket_ques_prepro):
 
     print('Running CV on Classifier...')
     classifier_CV = RandomForestClassifier()
-    scores = cross_val_score(classifier_CV, ticket_question_embeddings, mapping, cv=5)
-    cv_score = scores.mean()
+    cv_score = cross_val_proba_score(classifier_CV, ticket_question_embeddings, mapping,
+                                     scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5)
+    # scores = cross_val_score(classifier_CV, ticket_question_embeddings, mapping, cv=5)
+    # cv_score = scores.mean()
 
     print('Training Classifier...')
     classifier = RandomForestClassifier()
     classifier.fit(X=ticket_question_embeddings, y=mapping)
     dump(classifier, 'classifier/models/RF_word2vec.joblib')
-    train_score = classifier.score(X=ticket_question_embeddings, y=mapping)
+    y_pred_proba = classifier.predict_proba(ticket_question_embeddings)
+    train_score = multilabel_prec(y=mapping, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
+    #train_score = classifier.score(X=ticket_question_embeddings, y=mapping)
 
     print('Training Score: {0} \n Cross Val Score: {1}'.format(train_score, cv_score))
     print('###############')
