@@ -1,6 +1,7 @@
+from classifier.classifier import classifier
 from prediction.test import *
 
-MODEL = 'word2vec'
+MODEL = 'tfidf_w2v'
 SIM_THRESH = 0.2
 DATA_PREFIX = '../data/12-08-'
 CLASS_TYPE = 'cv'  # 'cv', 'val', 'test'
@@ -9,10 +10,10 @@ NFAQS = 5  # n FAQs to be considered for the top answer
 if __name__== "__main__" :
     # embedding(model=MODEL, data_prefix=DATA_PREFIX)
     # similarity(model=MODEL, thresh=SIM_THRESH)
-    # classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS)
+    classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS)
 
     # predict()
-    test(MODEL, data_prefix=DATA_PREFIX)
+    #test(MODEL, data_prefix=DATA_PREFIX)
 
     # TODO: test(doc2vec) outputs scores (nan, 0.0, nan)
     # TODO: link test and word2vec

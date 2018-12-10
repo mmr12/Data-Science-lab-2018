@@ -24,7 +24,7 @@ def test(model, data_prefix='../data/12-08-'):
             test_prepo = pickle.load(fp)
         model_path = 'embedding/models/word2vec_all.model'
         model = Word2Vec.load(model_path)
-        X_test = doc_emb_new_one_MR(test_prepo, model)
+        X_test = doc_emb_new_one(test_prepo, model)
         classifier = load('classifier/models/RF_word2vec.joblib')
 
     elif model == 'doc2vec':
@@ -65,7 +65,7 @@ def W2V(y):
 
 
 # word2vec support function
-def doc_emb_new_one_MR(doc_prepo, model):
+def doc_emb_new_one(doc_prepo, model):
     length = len(doc_prepo)
     mean_ans = np.empty((length, 128), dtype=float)
     # extract vocabulary
