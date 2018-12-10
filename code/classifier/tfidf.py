@@ -1,7 +1,6 @@
 import pickle
 
-from joblib import load, dump
-from sklearn.ensemble import RandomForestClassifier
+from joblib import load
 from sklearn.metrics.pairwise import cosine_similarity
 
 from .utils import *
@@ -27,23 +26,7 @@ def RF():
     # extract features
     matrix = TFiDF.transform(ticket_ques)
 
-    # debug
-    # print(matrix.shape, mapping.shape)
-
-    RF = RandomForestClassifier()
-    print('Running CV on Classifier...')
-    cv_score = cross_val_proba_score(RF, matrix, mapping, scoring=multilabel_prec, scoring_arg1=99, scoring_arg2=5,
-                                     n_splits=5)
-    # scores = cross_val_score(RF, matrix, mapping, cv=5)
-    # cv_score = scores.mean()
-
-    print('CV score on RF ', np.around(cv_score, 4))
-
-    # save model
-    RF_final = RandomForestClassifier()
-    RF_final.fit(matrix, mapping)
-    dump(RF_final, 'classifier/models/RF_TFiDF.joblib')
-    # dump(RF_final.predict(matrix), '/Users/margheritarosnati/Desktop/temp.joblib') #debug
+    return matrix, mapping
 
 
 def nn_classifier():

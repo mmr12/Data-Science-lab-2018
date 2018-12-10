@@ -3,9 +3,9 @@ import pickle
 from gensim.models import Word2Vec
 from joblib import dump
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import GradientBoostingClassifier
 
 from .utils import *
+
 
 def doc_emb_one(name, id_dict, all_docs_prepro, model):
     mean_ans = np.empty((len(id_dict[name]), 128), dtype=float)
@@ -53,7 +53,7 @@ def classification(mean_ticket_ques, mapping):
 def word_embedding(all_docs_prepro, id_dict):
 
     # Load the Word2Vec model
-    model_path = 'embedding/models/word2vec_ticket_ques.model'
+    model_path = 'embedding/models/word2vec_all.model'
     model = Word2Vec.load(model_path)
 
     with open('similarity/mappings/ticket_faq_map_word2vec.pkl', 'rb') as fp:
@@ -63,4 +63,5 @@ def word_embedding(all_docs_prepro, id_dict):
 
     ticket_question_embeddings = doc_emb_one('ticket_ques', id_dict, all_docs_prepro, model)
 
-    classification(ticket_question_embeddings, mapping)
+    return ticket_question_embeddings, mapping
+    # classification(ticket_question_embeddings, mapping)
