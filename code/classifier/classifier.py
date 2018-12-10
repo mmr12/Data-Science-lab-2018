@@ -1,8 +1,9 @@
+from sklearn.ensemble import RandomForestClassifier
+
 from .doc2vec import *
 from .tfidf import RF
-from .word2vec import *
 from .tfidf_w2v import *
-from sklearn.ensemble import RandomForestClassifier
+from .word2vec import *
 
 
 # Unpickle the document data, the ticket to FAQ map
@@ -57,6 +58,9 @@ def classifier(model, scoring=1, n_FAQs=5):
 
     elif model == 'word2vec':
         dump(classifier, 'classifier/models/RF_word2vec.joblib')
+
+    elif model == 'tfidf_w2v':
+        dump(classifier, 'classifier/models/RF_tfidf_w2v.joblib')
 
     elif model == 'doc2vec':
         dump(classifier, 'classifier/models/RF_doc2vec.joblib')
