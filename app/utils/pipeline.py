@@ -9,13 +9,13 @@ def load_classifier(model='tfidf'):
     # Load and return the classifier
     if model == 'tfidf':
         print('Loading TFiDF Classifier')
-        classifier = load('code/classifier/models/RF_TFiDF.joblib')
+        classifier = load('../code/classifier/models/RF_TFiDF.joblib')
     elif model == 'word2vec':
         print('Loading word2vec Classifier')
-        classifier = load('code/classifier/models/RF_word2vec.joblib')
+        classifier = load('../code/classifier/models/RF_word2vec.joblib')
     elif model == 'doc2vec':
         print('Loading doc2vec Classifier')
-        classifier = load('code/classifier/models/RF_doc2vec.joblib')
+        classifier = load('../code/classifier/models/RF_doc2vec.joblib')
     else:
         print('No Model {}'.format(model))
         classifier = None
@@ -28,13 +28,13 @@ def load_embedder(model='tfidf'):
     # Load and return the classifier
     if model == 'tfidf':
         print('Loading TFiDF Embedder')
-        embedder = load('code/embedding/models/TF-IFD-ticket-ques.joblib')
+        embedder = load('../code/embedding/models/TF-IFD-ticket-ques.joblib')
     elif model == 'word2vec':
         print('Loading word2vec Embedding')
-        embedder = Word2Vec.load('code/embedding/models/word2vec_ticket_ques.model')
+        embedder = Word2Vec.load('../code/embedding/models/word2vec_ticket_ques.model')
     elif model == 'doc2vec':
         print('Loading doc2vec Embedding')
-        embedder = Doc2Vec.load('code/embedding/models/doc2vec_ticket_ques.model')
+        embedder = Doc2Vec.load('../code/embedding/models/doc2vec_ticket_ques.model')
     else:
         print('No Model {}'.format(model))
         embedder = None

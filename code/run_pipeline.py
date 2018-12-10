@@ -3,7 +3,7 @@ from embedding.embedding import embedding
 from prediction.test import *
 from similarity.similarity import similarity
 
-MODEL = 'tfidf_w2v'
+MODEL = 'tfidf'
 SIM_THRESH = 0.2
 DATA_PREFIX = '../data/12-08-'
 CLASS_TYPE = 'cv'  # 'cv', 'val', 'test'
