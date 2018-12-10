@@ -72,7 +72,7 @@ def faq_data_from_predictions(probs, labels):
 
 def load_raw_faq_data():
     # Load the raw title and content of FAQ for display
-    with open("../code/embedding/models/doc_data/all_docs_sep.pkl", "rb") as fp:
+    with open("code/embedding/models/doc_data/all_docs_sep.pkl", "rb") as fp:
         all_docs_sep = pickle.load(fp)
     return all_docs_sep['faq_raw_answer'], all_docs_sep['faq_title']
 

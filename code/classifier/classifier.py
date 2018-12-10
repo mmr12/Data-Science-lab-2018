@@ -2,6 +2,7 @@ from .doc2vec import *
 from .tfidf import RF
 from .word2vec import *
 from .tfidf_w2v import *
+from sklearn.ensemble import RandomForestClassifier
 
 
 # Unpickle the document data, the ticket to FAQ map
