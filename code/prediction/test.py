@@ -31,6 +31,7 @@ def test(model, data_prefix='../data/12-08-'):
         X_test = np.array([model.infer_vector(test_prepo[i]) for i in range(len(test_prepo))])
         classifier = load('classifier/models/RF_doc2vec.joblib')
 
+
     else:
         print('Model {} not found'.format(model))
         return 0
@@ -38,6 +39,9 @@ def test(model, data_prefix='../data/12-08-'):
     y_hat = classifier.predict_proba(X_test)
     scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
     print("precision, recall, F1-score", scores)
+    y_hat = np.zeros(y_hat.shape) - 1
+    scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
+    print("When predicting all -1, precision, recall, F1-score", scores)
     return scores
 
 
