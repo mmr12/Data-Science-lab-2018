@@ -1,9 +1,11 @@
 import pickle
-
-from gensim.corpora import Dictionary
+import numpy as np
+import pandas as pd
 from gensim.models import Word2Vec
 from gensim.models.doc2vec import Doc2Vec
 from joblib import load
+from gensim.corpora import Dictionary
+from gensim.models import TfidfModel
 
 from .utils import *
 
@@ -95,16 +97,17 @@ def tfidf_w2v(all_docs_prepro, id_dict, thresh):
     model_path = 'embedding/models/word2vec_all.model'
     model_w2v = Word2Vec.load(model_path)
 
-    print('Loading Word2vec model')
+    print('Loading Tfidf model')
     model_path = 'embedding/models/tfidf_all.model'
-    model_tfidf = Word2Vec.load(model_path)
+    model_tfidf = TfidfModel.load(model_path)
 
     dct = Dictionary(all_docs_prepro)
     corpus = [dct.doc2bow(line) for line in all_docs_prepro]
 
     mean_ticket_ans = all_average(dat='ticket_ans', corpus=corpus, dct=dct, model_w2v=model_w2v,
                                   model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
-    mean_faq_ans = all_average(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf)
+    mean_faq_ans = all_average(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf,
+                               id_dict=id_dict, all_docs_prepro=all_docs_prepro)
 
     output = compute_sim(mean_ticket_ans, mean_faq_ans, thresh)
 
@@ -129,4 +132,4 @@ def document_embedding(n_faq, n_ticket, thresh):
 
 if __name__== "__main__":
     # TODO: allow command line arguments or something
-    similarity('word2vec', 0.5)
+    similarity('tfidf_w2v', 0.5)

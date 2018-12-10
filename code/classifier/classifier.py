@@ -1,6 +1,8 @@
 from .doc2vec import *
 from .tfidf import RF
 from .word2vec import *
+from .tfidf_w2v import *
+from sklearn.ensemble import RandomForestClassifier
 
 
 # Unpickle the document data, the ticket to FAQ map
@@ -10,11 +12,21 @@ def classifier(model, scoring=1, n_FAQs=5):
         X_train, y_train = RF()
 
     elif model == 'word2vec':
+
         with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
             all_docs_prepro = pickle.load(fp)
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
             id_dict = pickle.load(fp)
         X_train, y_train = word_embedding(all_docs_prepro, id_dict)
+
+    elif model == 'tfidf_w2v':
+
+        with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+            all_docs_prepro = pickle.load(fp)
+        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
+            id_dict = pickle.load(fp)
+
+        tfidf_w2v(all_docs_prepro, id_dict)
 
     elif model == 'doc2vec':
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
@@ -53,4 +65,4 @@ def classifier(model, scoring=1, n_FAQs=5):
 # TODO: included files here and not in directory file
 
 if __name__ == "__main__":
-    classifier()
+    classifier('tfidf_w2v')

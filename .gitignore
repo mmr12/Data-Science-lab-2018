@@ -244,3 +244,5 @@ data/
 # MR: somehow this file is preventing me from pulling:
 *.pkl
 *.txt
+# This shouldnt be in
+*.DS_Store
