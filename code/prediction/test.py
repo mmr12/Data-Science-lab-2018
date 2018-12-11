@@ -1,6 +1,7 @@
 import pickle
 
-from gensim.models import Word2Vec, Doc2Vec
+from gensim.models import Word2Vec, Doc2Vec, TfidfModel
+from gensim.corpora import Dictionary
 from joblib import load
 
 from .utils import *
@@ -37,6 +38,29 @@ def test(model, data_prefix='../data/12-08-', scoring=99, n_FAQs=6):
         X_test = np.array([model.infer_vector(test_prepo[i]) for i in range(len(test_prepo))])
         classifier = load('classifier/models/RF_doc2vec.joblib')
 
+    elif model == 'tfidf_w2v':
+        # load data
+        with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+            test_prepo = pickle.load(fp)
+        # some embedding processing
+        dct = Dictionary(test_prepo)
+        corpus = [dct.doc2bow(line) for line in test_prepo]
+
+        # load models
+        print('Loading Word2vec model')
+        model_path = 'embedding/models/word2vec_all.model'
+        model_w2v = Word2Vec.load(model_path)
+
+        print('Loading Tfidf model')
+        model_path = 'embedding/models/tfidf_all.model'
+        model_tfidf = TfidfModel.load(model_path)
+        X_test = all_avg(ind_start=0,
+                         ind_end=len(test_prepo),
+                         corpus=corpus,
+                         dct=dct,
+                         model_w2v=model_w2v,
+                         model_tfidf=model_tfidf)
+        classifier = load('classifier/models/RF_tfidf_w2v.joblib')
 
     else:
         print('Model {} not found'.format(model))

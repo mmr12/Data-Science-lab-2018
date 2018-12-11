@@ -38,8 +38,9 @@ def classifier(model, scoring=1, n_FAQs=5):
 
     # train
     print('Training Classifier...')
-    classifier = RandomForestClassifier()
+    classifier = RandomForestClassifier()  # class_weight="balanced")
     classifier.fit(X_train, y_train)
+
 
     print('Running CV on Classifier...')
     classifier_CV = RandomForestClassifier()

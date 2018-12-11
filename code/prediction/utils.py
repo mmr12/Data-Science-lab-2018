@@ -104,3 +104,27 @@ def parmap_wrap(train_index, test_index, X, y, RF, scoring=multilabel_prec, scor
     y_hat = RF.predict_proba(X_test)
     score = scoring(y_test, y_hat, what_to_predict=scoring_arg1, nvals=scoring_arg2)
     return score
+
+
+def all_avg(ind_start,
+            ind_end,
+            corpus,
+            dct,
+            model_w2v,
+            model_tfidf):
+    # extract vocabulary
+    word_vectors = model_w2v.wv
+    length = ind_end - ind_start
+    mean_ans = np.empty((length, 128), dtype=float)
+    for i in range(length):
+        vector = np.asarray(model_tfidf[corpus[ind_start]], dtype=float)
+        words = np.empty((len(vector), 128), dtype=float)
+        for j in range(len(vector)):
+            if dct[int(vector[j, 0])] in word_vectors.vocab:
+                words[j] = model_w2v[dct[int(vector[j, 0])]]
+            else:
+                words[j] = 0
+        mean_ans[i] = np.average(words, 0, weights=vector[:, 1])
+        ind_start += 1
+
+    return mean_ans
