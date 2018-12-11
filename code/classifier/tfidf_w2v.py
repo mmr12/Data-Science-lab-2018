@@ -81,4 +81,5 @@ def tfidf_w2v(all_docs_prepro, id_dict):
     mean_ticket_ques = all_average('ticket_ques', corpus=corpus, dct=dct, model_w2v=model_w2v,
                                    model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
 
-    classification(mean_ticket_ques, mapping)
+    return mean_ticket_ques, mapping
+    # classification(mean_ticket_ques, mapping)
