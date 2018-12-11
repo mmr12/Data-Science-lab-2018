@@ -6,13 +6,13 @@ from similarity.similarity import similarity
 MODEL = 'tfidf_w2v'
 # thresholds
 if MODEL == "tfidf":
-    thresh = 0.2
+    thresh = 0.2  # 75% quantile 0.24
 elif MODEL == "word2vec":
-    thresh = 0.96
+    thresh = 0.96  #75% quantile 0.96
 elif MODEL == "doc2vec":
-    thresh = 0.98
+    thresh = 0.98  #75% quantile 0.98
 elif MODEL == "tfidf_w2v":
-    thresh = 0
+    thresh = 0  #
 else:
     print("Please select valid model")
 SIM_THRESH = thresh
