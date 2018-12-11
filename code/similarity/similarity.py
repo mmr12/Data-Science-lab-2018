@@ -1,11 +1,10 @@
 import pickle
-import numpy as np
-import pandas as pd
+
+from gensim.corpora import Dictionary
+from gensim.models import TfidfModel
 from gensim.models import Word2Vec
 from gensim.models.doc2vec import Doc2Vec
 from joblib import load
-from gensim.corpora import Dictionary
-from gensim.models import TfidfModel
 
 from .utils import *
 
@@ -79,10 +78,10 @@ def word_embedding(all_docs_prepro, id_dict, thresh):
     model = Word2Vec.load(model_path)
 
     print('Computing word2vec similarity')
-    #create doc vector for tickets answers i.e. average over each ticket ans the word2vec vector for each word
+    # create doc vector for tickets answers i.e. average over each ticket ans the word2vec vector for each word
     mean_ticket_ans = doc_emb_one(name='ticket_ans', id_dict=id_dict, all_docs_prepro=all_docs_prepro,
                                   model=model)
-    #create doc vector for faq ans i.e. average over each faq ans the word2vec vector for each word
+    # create doc vector for faq ans i.e. average over each faq ans the word2vec vector for each word
     mean_faq_ans = doc_emb_one(name='faq_ans', id_dict=id_dict, all_docs_prepro=all_docs_prepro, model=model)
 
     output = compute_sim(mean_ticket_ans=mean_ticket_ans, mean_faq_ans=mean_faq_ans, thresh=thresh)

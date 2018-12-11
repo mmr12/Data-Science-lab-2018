@@ -1,11 +1,13 @@
-from sklearn.ensemble import RandomForestClassifier
 import pickle
-import numpy as np
-from .utils import *
-from joblib import dump
-from gensim.models import Word2Vec
+
 from gensim.corpora import Dictionary
 from gensim.models import TfidfModel
+from gensim.models import Word2Vec
+from joblib import dump
+from sklearn.ensemble import RandomForestClassifier
+
+from .utils import *
+
 
 def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
     if dat == 'faq_ans':
@@ -81,4 +83,5 @@ def tfidf_w2v(all_docs_prepro, id_dict):
     mean_ticket_ques = all_average('ticket_ques', corpus=corpus, dct=dct, model_w2v=model_w2v,
                                    model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
 
-    classification(mean_ticket_ques, mapping)
+    return (mean_ticket_ques, mapping)
+    # classification(mean_ticket_ques, mapping)

@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -53,16 +52,20 @@ def compute_sim(mean_ticket_ans, mean_faq_ans, thresh):
     FAQ_per_ticket[strength_FAQ_ticket < thresh] = -1
 
     # some stats
-    n_unique = len(np.unique(FAQ_per_ticket))
+    uniques, counts = np.unique(FAQ_per_ticket, return_counts=True)
+    n_unique = len(uniques)
+    solo_classes = np.sum(counts == 1)
     n_nonassigned = np.shape(FAQ_per_ticket[strength_FAQ_ticket < thresh])[0]
     n_tickets = len(FAQ_per_ticket)
     # How many tickets each FAQ is assigned
-    counts_per_faq = pd.Series(FAQ_per_ticket).value_counts()
+    # counts_per_faq = pd.Series(FAQ_per_ticket).value_counts()
     #print(counts_per_faq)
 
     output = {
         'classes': n_tickets,
         'mapping': FAQ_per_ticket
     }
-    print(n_unique, 'classes, with ', round(n_nonassigned / n_tickets, 2), '% non assigned tickets')
+    print(n_unique, '\tclasses out of 200')
+    print(round(n_nonassigned / n_tickets, 2), '\tnon assigned tickets (should be ~0.75)')
+    print(solo_classes, "\tclasses with one ticket only")
     return output

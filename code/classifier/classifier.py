@@ -1,5 +1,3 @@
-from sklearn.ensemble import RandomForestClassifier
-
 from .doc2vec import *
 from .tfidf import RF
 from .tfidf_w2v import *
@@ -27,7 +25,7 @@ def classifier(model, scoring=1, n_FAQs=5):
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
             id_dict = pickle.load(fp)
 
-        tfidf_w2v(all_docs_prepro, id_dict)
+        X_train, y_train = tfidf_w2v(all_docs_prepro, id_dict)
 
     elif model == 'doc2vec':
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
