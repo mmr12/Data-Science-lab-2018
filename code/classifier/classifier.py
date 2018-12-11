@@ -1,5 +1,3 @@
-from sklearn.ensemble import RandomForestClassifier
-
 from .doc2vec import *
 from .tfidf import RF
 from .tfidf_w2v import *

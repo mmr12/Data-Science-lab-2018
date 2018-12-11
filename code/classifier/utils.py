@@ -13,13 +13,20 @@ from sklearn.model_selection import KFold
 #   2: recall
 #  99: precision, recall, F1-score
 def multilabel_prec(y, y_pred_proba, what_to_predict=1, nvals=5):
+    # predictions:
     y_preds = np.argsort(y_pred_proba, axis=1)[:, -nvals:] - 1
-    TP = np.sum([is_in(y_preds[i, :], y[i]) for i in range(len(y))])
+    if np.sum(y_pred_proba) == 0:
+        y_preds = np.zeros(y_preds.shape) - 1
+    # classes to check:
+    TP = [np.sum([is_in(y_preds[i, :], y[j]) for i in range(len(y))]) for j in range(len(y))]
+    # print("weighted mean TP", np.mean(TP), "nans", np.sum(np.isnan(TP)))
     FP = [np.sum([is_in(y_preds[i, :], j) for i in range(len(y))]) for j in range(len(y))]
+    # print("weighted mean FP", np.mean(FP), "nans", np.sum(np.isnan(FP)))
     FN = [np.sum([is_not_in(y_preds[i, :], j) for i in range(len(y))]) for j in range(len(y))]
-    precision = np.mean([TP / (TP + FP[i]) for i in range(len(y))])
-    recall = np.mean([TP / (TP + FN[i]) for i in range(len(y))])
-    F1 = 2 * precision * recall / (precision + recall)
+    # print("weighted mean FN", np.mean(FN))
+    precision = np.round(np.nansum([TP[i] / (TP[i] + FP[i]) for i in range(len(y))]) / len(y), 3)
+    recall = np.round(np.nansum([TP[i] / (TP[i] + FN[i]) for i in range(len(y))]) / len(y), 3)
+    F1 = np.round(2 * precision * recall / (precision + recall), 3)
     if what_to_predict == 0:
         return F1
     elif what_to_predict == 1:

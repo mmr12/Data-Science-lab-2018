@@ -6,7 +6,7 @@ from joblib import load
 from .utils import *
 
 
-def test(model, data_prefix='../data/12-08-'):
+def test(model, data_prefix='../data/12-08-', scoring=99, n_FAQs=6):
     with open(data_prefix + 'val-test.pkl', "rb") as fp:
         test_dic = pickle.load(fp)
 
@@ -43,25 +43,13 @@ def test(model, data_prefix='../data/12-08-'):
         return 0
 
     y_hat = classifier.predict_proba(X_test)
-    scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
+    scores = multilabel_prec(y, y_hat, what_to_predict=scoring, nvals=n_FAQs)
     print("precision, recall, F1-score", scores)
-    y_hat = np.zeros(y_hat.shape) - 1
-    scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
+    y_hat = np.zeros(y_hat.shape)
+    scores = multilabel_prec(y, y_hat, what_to_predict=scoring, nvals=n_FAQs)
     print("When predicting all -1, precision, recall, F1-score", scores)
     return scores
 
-
-def W2V(y):
-    with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
-        test_prepo = pickle.load(fp)
-    # Load the Word2Vec model
-    model_path = 'embedding/models/word2vec_ticket_ques.model'
-    model = Word2Vec.load(model_path)
-    X_test = doc_emb(test_prepo, model)
-    classifier = load('classifier/models/RF_word2vec.joblib')
-    y_hat = classifier.predict_proba(X_test)
-    scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
-    return scores
 
 
 # word2vec support function
