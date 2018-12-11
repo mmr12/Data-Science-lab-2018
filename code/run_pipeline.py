@@ -11,6 +11,10 @@ elif MODEL == "doc2vec":
     thresh = 0.98  #75% quantile 0.98
 elif MODEL == "tfidf_w2v":
     thresh = 0  #
+elif MODEL == "tfidf_w2v_top5a":
+    thresh = .90 # what is it its 75% quantile??
+elif MODEL == "tfidf_w2v_top5w":
+    thresh = .90 # what is it its 75% quantile??
 else:
     print("Please select valid model")
 SIM_THRESH = thresh

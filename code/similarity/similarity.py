@@ -53,6 +53,10 @@ def similarity(model, thresh):
         tfidf_w2v(all_docs_prepro, id_dict, thresh)
     elif model == 'doc2vec':
         document_embedding(n_faq, n_ticket, thresh)
+    elif model == 'tfidf_w2v_top5a':
+        tfidf_w2v_top5a(all_docs_prepro, id_dict, thresh)
+    elif model == 'tfidf_w2v_top5w':
+        tfidf_w2v_top5w(all_docs_prepro, id_dict, thresh)
     else:
         print('No model {} found'.format(model))
 
@@ -113,6 +117,49 @@ def tfidf_w2v(all_docs_prepro, id_dict, thresh):
     with open("../code/similarity/mappings/map_w2v_tfidf_all.pkl", "wb") as fp:
         pickle.dump(output, fp)
 
+def tfidf_w2v_top5a(all_docs_prepro, id_dict, thresh):
+    print('Loading Word2vec model')
+    model_path = 'embedding/models/word2vec_all.model'
+    model_w2v = Word2Vec.load(model_path)
+
+    print('Loading Tfidf model')
+    model_path = 'embedding/models/tfidf_all.model'
+    model_tfidf = TfidfModel.load(model_path)
+
+    dct = Dictionary(all_docs_prepro)
+    corpus = [dct.doc2bow(line) for line in all_docs_prepro]
+
+    mean_ticket_ans = top5(dat='ticket_ans', corpus=corpus, dct=dct, model_w2v=model_w2v,
+                           model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
+    mean_faq_ans = top5(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf,
+                        id_dict=id_dict, all_docs_prepro=all_docs_prepro)
+
+    output = compute_sim(mean_ticket_ans, mean_faq_ans, thresh)
+
+    with open("../code/similarity/mappings/map_w2v_tfidf_5a.pkl", "wb") as fp:
+        pickle.dump(output, fp)
+
+def tfidf_w2v_top5w(all_docs_prepro, id_dict, thresh):
+    print('Loading Word2vec model')
+    model_path = 'embedding/models/word2vec_all.model'
+    model_w2v = Word2Vec.load(model_path)
+
+    print('Loading Tfidf model')
+    model_path = 'embedding/models/tfidf_all.model'
+    model_tfidf = TfidfModel.load(model_path)
+
+    dct = Dictionary(all_docs_prepro)
+    corpus = [dct.doc2bow(line) for line in all_docs_prepro]
+
+    mean_ticket_ans = top5_average(dat='ticket_ans', corpus=corpus, dct=dct, model_w2v=model_w2v,
+                                   model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
+    mean_faq_ans = top5_average(dat='faq_ans', corpus=corpus, dct=dct, model_w2v=model_w2v, model_tfidf=model_tfidf,
+                                id_dict=id_dict, all_docs_prepro=all_docs_prepro)
+
+    output = compute_sim(mean_ticket_ans, mean_faq_ans, thresh)
+
+    with open("../code/similarity/mappings/map_w2v_tfidf_5w.pkl", "wb") as fp:
+        pickle.dump(output, fp)
 
 def document_embedding(n_faq, n_ticket, thresh):
     print('Loading Doc2Vec Model...')

@@ -84,6 +84,10 @@ def embedding(model, data_prefix='../data/12-04-'):
         word_embedding(all_docs_prepro)
     elif model == 'tfidf_w2v':
         tfidf_w2v(all_docs_prepro)
+    elif model == 'tfidf_w2v_top5a':
+        tfidf_w2v_top5a(all_docs_prepro)
+    elif model == 'tfidf_w2v_top5a':
+        tfidf_w2v_top5w(all_docs_prepro)
     elif model == 'doc2vec':
         document_embedding(all_ans_prepro, ticket_ques_prepro)
     else:
@@ -137,6 +141,55 @@ def tfidf_w2v(all_docs_prepro):
         model_tfidf.save(word_path)
 
     #WORD2VEC MODEL
+    exists = os.path.isfile('embedding/models/word2vec_all.model')
+    if exists:
+        print('Word2vec embedding model already existing')
+    else:
+        print('Training word2vec on all answers')
+        word_path = "embedding/models/word2vec_all.model"
+        word_tempfile = get_tmpfile(word_path)
+        word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=4)
+        word_model.save(word_path)
+
+
+def tfidf_w2v_top5a(all_docs_prepro):
+
+    # TFIDF MODEL
+    exists = os.path.isfile('embedding/models/tfidf_all.model')
+    if exists:
+        print('Tfidf embedding model already existing')
+    else:
+        dct = Dictionary(all_docs_prepro)  # fit dictionary
+        corpus = [dct.doc2bow(line) for line in all_docs_prepro]  # convert corpus to BoW format
+        model_tfidf = TfidfModel(corpus)
+        word_path = 'embedding/models/tfidf_all.model'
+        model_tfidf.save(word_path)
+
+    # WORD2VEC MODEL
+    exists = os.path.isfile('embedding/models/word2vec_all.model')
+    if exists:
+        print('Word2vec embedding model already existing')
+    else:
+        print('Training word2vec on all answers')
+        word_path = "embedding/models/word2vec_all.model"
+        word_tempfile = get_tmpfile(word_path)
+        word_model = Word2Vec(all_docs_prepro, size=128, window=5, min_count=1, workers=4)
+        word_model.save(word_path)
+
+
+def tfidf_w2v_top5w(all_docs_prepro):
+    # TFIDF MODEL
+    exists = os.path.isfile('embedding/models/tfidf_all.model')
+    if exists:
+        print('Tfidf embedding model already existing')
+    else:
+        dct = Dictionary(all_docs_prepro)  # fit dictionary
+        corpus = [dct.doc2bow(line) for line in all_docs_prepro]  # convert corpus to BoW format
+        model_tfidf = TfidfModel(corpus)
+        word_path = 'embedding/models/tfidf_all.model'
+        model_tfidf.save(word_path)
+
+    # WORD2VEC MODEL
     exists = os.path.isfile('embedding/models/word2vec_all.model')
     if exists:
         print('Word2vec embedding model already existing')

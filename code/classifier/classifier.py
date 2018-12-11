@@ -1,6 +1,8 @@
 from .doc2vec import *
 from .tfidf import RF
 from .tfidf_w2v import *
+from .tfidf_w2v_top5a import *
+from .tfidf_w2v_top5w import *
 from .word2vec import *
 
 
@@ -26,6 +28,22 @@ def classifier(model, scoring=1, n_FAQs=5):
             id_dict = pickle.load(fp)
 
         X_train, y_train = tfidf_w2v(all_docs_prepro, id_dict)
+
+    elif model == 'tfidf_w2v_top5a':
+        with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+            all_docs_prepro = pickle.load(fp)
+        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
+            id_dict = pickle.load(fp)
+
+        X_train, y_train = tfidf_w2v_top5a(all_docs_prepro, id_dict)
+
+    elif model == 'tfidf_w2v_top5w':
+        with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+            all_docs_prepro = pickle.load(fp)
+        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
+            id_dict = pickle.load(fp)
+
+        X_train, y_train = tfidf_w2v_top5w(all_docs_prepro, id_dict)
 
     elif model == 'doc2vec':
         with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
@@ -59,6 +77,12 @@ def classifier(model, scoring=1, n_FAQs=5):
 
     elif model == 'tfidf_w2v':
         dump(classifier, 'classifier/models/RF_tfidf_w2v.joblib')
+
+    elif model == 'tfidf_w2v_top5a':
+        dump(classifier, 'classifier/models/RF_tfidf_w2v_5a.joblib')
+
+    elif model == 'tfidf_w2v_top5w':
+        dump(classifier, 'classifier/models/RF_tfidf_w2v_5w.joblib')
 
     elif model == 'doc2vec':
         dump(classifier, 'classifier/models/RF_doc2vec.joblib')
