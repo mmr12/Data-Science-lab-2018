@@ -99,3 +99,6 @@ def get_faq_titles(faq_indexs, faq_title):
 def rev_sort(arr, n):
     # Return args of greatest n values in arr
     return arr.argsort()[-n:][::-1]
+
+def button(text, id):
+    return html.Div(html.Button(text, id=id, n_clicks_timestamp='0'), className="four columns", style={'textAlign':'center'})

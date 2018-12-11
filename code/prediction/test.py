@@ -19,7 +19,13 @@ def test(model, data_prefix='../data/12-08-'):
         classifier = load('classifier/models/RF_TFiDF.joblib')
 
     elif model == 'word2vec':
-        W2V(y)
+        # load data
+        with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+            test_prepo = pickle.load(fp)
+        model_path = 'embedding/models/word2vec_all.model'
+        model = Word2Vec.load(model_path)
+        X_test = doc_emb_new_one(test_prepo, model)
+        classifier = load('classifier/models/RF_word2vec.joblib')
 
     elif model == 'doc2vec':
         # load data
@@ -31,6 +37,7 @@ def test(model, data_prefix='../data/12-08-'):
         X_test = np.array([model.infer_vector(test_prepo[i]) for i in range(len(test_prepo))])
         classifier = load('classifier/models/RF_doc2vec.joblib')
 
+
     else:
         print('Model {} not found'.format(model))
         return 0
@@ -38,6 +45,9 @@ def test(model, data_prefix='../data/12-08-'):
     y_hat = classifier.predict_proba(X_test)
     scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
     print("precision, recall, F1-score", scores)
+    y_hat = np.zeros(y_hat.shape) - 1
+    scores = multilabel_prec(y, y_hat, what_to_predict=99, nvals=5)
+    print("When predicting all -1, precision, recall, F1-score", scores)
     return scores
 
 
@@ -55,14 +65,21 @@ def W2V(y):
 
 
 # word2vec support function
-def doc_emb(dat, model):
-    mean_ans = np.empty((len(dat), 128), dtype=float)
-    for j in range(len(dat)):
-        sentence = dat[j]
-        words = np.empty((len(sentence), 128), dtype=float)
+def doc_emb_new_one(doc_prepo, model):
+    length = len(doc_prepo)
+    mean_ans = np.empty((length, 128), dtype=float)
+    # extract vocabulary
+    word_vectors = model.wv
+    for j in range(length):
+        sentence = doc_prepo[j]
+        # let's go a little old school
+        words = np.empty(128, dtype=float)
+        counter = 0
         for i in range(len(sentence)):
-            words[i] = model[sentence[i]]
-        mean_ans[j] = np.apply_along_axis(np.mean, 0, words)
+            if sentence[i] in word_vectors.vocab:
+                words += model[sentence[i]]
+                counter += 1
+        mean_ans[j] = words / counter
     return mean_ans
 
 

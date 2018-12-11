@@ -12,3 +12,4 @@ Optional arguments:
 - '-e' to select the embedding. Choose between 'word2vec', 'doc2vec'
 - 
 
+# TODO: finish writing this!!
