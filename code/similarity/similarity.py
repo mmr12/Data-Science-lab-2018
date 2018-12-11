@@ -178,4 +178,4 @@ def document_embedding(n_faq, n_ticket, thresh):
 
 if __name__== "__main__":
     # TODO: allow command line arguments or something
-    similarity('tfidf_w2v', 0.5)
+    similarity('tfidf_w2v_top5a', 0.5)

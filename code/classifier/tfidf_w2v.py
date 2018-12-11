@@ -45,7 +45,7 @@ def classification(mean_ticket_ques, mapping):
     classifier = RandomForestClassifier()
     classifier.fit(X=mean_ticket_ques, y=mapping)
     y_pred_proba = classifier.predict_proba(mean_ticket_ques)
-    dump(classifier, 'classifier/models/RF_word2vec.joblib')
+    dump(classifier, 'classifier/models/RF_tfidf_word2vec.joblib')
     train_score = multilabel_prec(y=mapping, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
     #train_score = classifier.score(X=mean_ticket_ques, y=mapping)
     print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))

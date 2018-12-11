@@ -1,7 +1,7 @@
 from classifier.classifier import classifier
 from prediction.test import *
 
-MODEL = 'tfidf_w2v'
+MODEL = 'tfidf_w2v_top5a'
 # thresholds
 if MODEL == "tfidf":
     thresh = 0.2  # 75% quantile 0.24

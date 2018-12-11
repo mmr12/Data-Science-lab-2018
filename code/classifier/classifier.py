@@ -91,4 +91,4 @@ def classifier(model, scoring=1, n_FAQs=5):
 # TODO: included files here and not in directory file
 
 if __name__ == "__main__":
-    classifier('tfidf_w2v')
+    classifier('tfidf_w2v_top5a')

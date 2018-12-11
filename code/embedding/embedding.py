@@ -270,4 +270,4 @@ def dump_documents(all_docs, id_dict, all_docs_sep, all_ans_prepro, ticket_ques_
 
 if __name__== "__main__":
     # TODO: allow argument passing
-    embedding('tfidf_w2v', '../data/12-04-')
+    embedding('tfidf_w2v_top5a', '../data/12-04-')
