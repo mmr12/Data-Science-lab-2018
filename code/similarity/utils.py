@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+from operator import itemgetter
 
 
 # compute sentence embedding for word2vec
@@ -34,6 +35,58 @@ def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prep
         for j in range(len(vector)):
             words[j] = model_w2v[dct[int(vector[j,0])]]
         mean_ans[i] = np.average(words, 0, weights=vector[:,1])
+        ind += 1
+    return mean_ans
+
+def top5(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
+    if dat == 'faq_ans':
+        ind = id_dict['faq_ans'][0]
+        leng = len(id_dict['faq_ans'])
+        dat = all_docs_prepro[ind:leng]
+    elif dat == 'ticket_ans':
+        ind = id_dict['ticket_ans'][0]
+        leng = len(id_dict['ticket_ans'])
+        dat = all_docs_prepro[ind:leng]
+    else:
+        ind = id_dict['ticket_ques'][0]
+        leng = len(id_dict['ticket_ques'])
+        dat = all_docs_prepro[ind:leng]
+    mean_ans = np.empty((leng, 128), dtype=float)
+    for i in range(leng):
+        vector = model_tfidf[corpus[ind]]
+        vector_s = sorted(vector, key=itemgetter(1), reverse=True)
+        top5 = vector_s[:5]
+        top5 = np.asarray(top5, dtype=int)[:,0]
+        words = np.empty((len(top5), 128), dtype=float)
+        for j in range(len(top5)):
+            words[j] = model_w2v[dct[top5[j]]]
+        mean_ans[i] = np.apply_along_axis(np.mean, 0, words)
+        ind += 1
+    return mean_ans
+
+def top5_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
+    if dat == 'faq_ans':
+        ind = id_dict['faq_ans'][0]
+        leng = len(id_dict['faq_ans'])
+        dat = all_docs_prepro[ind:leng]
+    elif dat == 'ticket_ans':
+        ind = id_dict['ticket_ans'][0]
+        leng = len(id_dict['ticket_ans'])
+        dat = all_docs_prepro[ind:leng]
+    else:
+        ind = id_dict['ticket_ques'][0]
+        leng = len(id_dict['ticket_ques'])
+        dat = all_docs_prepro[ind:leng]
+    mean_ans = np.empty((leng, 128), dtype=float)
+    for i in range(leng):
+        vector = model_tfidf[corpus[ind]]
+        vector_s = sorted(vector, key=itemgetter(1), reverse=True)
+        top5 = vector_s[:5]
+        top5 = np.asarray(top5, dtype=float)
+        words = np.empty((len(top5), 128), dtype=float)
+        for j in range(len(top5)):
+            words[j] = model_w2v[dct[int(top5[j,0])]]
+        mean_ans[i] = np.average(words, 0, weights=top5[:,1])
         ind += 1
     return mean_ans
 

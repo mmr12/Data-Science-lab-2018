@@ -5,11 +5,12 @@ from gensim.models import TfidfModel
 from gensim.models import Word2Vec
 from joblib import dump
 from sklearn.ensemble import RandomForestClassifier
+from operator import itemgetter
 
 from .utils import *
 
 
-def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
+def top5(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
     if dat == 'faq_ans':
         ind = id_dict['faq_ans'][0]
         leng = len(id_dict['faq_ans'])
@@ -24,11 +25,14 @@ def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prep
         dat = all_docs_prepro[ind:leng]
     mean_ans = np.empty((leng, 128), dtype=float)
     for i in range(leng):
-        vector = np.asarray(model_tfidf[corpus[ind]], dtype=float)
-        words = np.empty((len(vector), 128), dtype=float)
-        for j in range(len(vector)):
-            words[j] = model_w2v[dct[int(vector[j,0])]]
-        mean_ans[i] = np.average(words, 0, weights=vector[:,1])
+        vector = model_tfidf[corpus[ind]]
+        vector_s = sorted(vector, key=itemgetter(1), reverse=True)
+        top5 = vector_s[:5]
+        top5 = np.asarray(top5, dtype=int)[:,0]
+        words = np.empty((len(top5), 128), dtype=float)
+        for j in range(len(top5)):
+            words[j] = model_w2v[dct[top5[j]]]
+        mean_ans[i] = np.apply_along_axis(np.mean, 0, words)
         ind += 1
     return mean_ans
 
@@ -45,7 +49,7 @@ def classification(mean_ticket_ques, mapping):
     classifier = RandomForestClassifier()
     classifier.fit(X=mean_ticket_ques, y=mapping)
     y_pred_proba = classifier.predict_proba(mean_ticket_ques)
-    dump(classifier, 'classifier/models/RF_tfidf_word2vec.joblib')
+    dump(classifier, 'classifier/models/RF_tfidf_word2vec_5a.joblib')
     train_score = multilabel_prec(y=mapping, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
     #train_score = classifier.score(X=mean_ticket_ques, y=mapping)
     print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
@@ -64,8 +68,8 @@ def classification(mean_ticket_ques, mapping):
     print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
     '''
 
-def tfidf_w2v(all_docs_prepro, id_dict):
-    with open('../code/similarity/mappings/map_w2v_tfidf_all.pkl', 'rb') as fp:
+def tfidf_w2v_top5a(all_docs_prepro, id_dict):
+    with open('../code/similarity/mappings/map_w2v_tfidf_5a.pkl', 'rb') as fp:
         Classes = pickle.load(fp)
     mapping = Classes['mapping']
 
@@ -80,8 +84,8 @@ def tfidf_w2v(all_docs_prepro, id_dict):
     dct = Dictionary(all_docs_prepro)
     corpus = [dct.doc2bow(line) for line in all_docs_prepro]
 
-    mean_ticket_ques = all_average('ticket_ques', corpus=corpus, dct=dct, model_w2v=model_w2v,
-                                   model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
+    mean_ticket_ques = top5('ticket_ques', corpus=corpus, dct=dct, model_w2v=model_w2v,
+                            model_tfidf=model_tfidf, id_dict=id_dict, all_docs_prepro=all_docs_prepro)
 
     return (mean_ticket_ques, mapping)
     # classification(mean_ticket_ques, mapping)
