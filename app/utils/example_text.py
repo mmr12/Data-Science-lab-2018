@@ -1,6 +1,13 @@
-import pandas as pd
+import pickle
+import random
 
 def load_example_texts():
 
-    example_tables = pd.read_csv('assets/example_texts.csv')
-    return list(example_tables.text)
+    with open('../data/12-08-val-test.pkl', 'rb') as f:
+        val_set_tickets = pickle.load(f)
+
+        return val_set_tickets['x_test']
+
+def random_ticket(tickets):
+
+    return random.choice(tickets)

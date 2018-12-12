@@ -18,10 +18,11 @@ def create_faq_boxes(faqs):
 def create_faq_box(faq):
 
     probability_style ={
-        "background": '#57c5f7',
+        "background": '#1269b0',
         "color": "white",
         "padding": "5px",
-        "borderRadius": "5px"}
+        "borderRadius": "5px"
+    }
 
     # Generates an FAQ box
     # dictionary with keys 'title' and 'text' and 'prob' and 'index'
@@ -29,7 +30,7 @@ def create_faq_box(faq):
     box = html.Div([
         html.H3(faq['title']),
         html.Div([html.Span('Probability: {}'.format(faq['prob']), style=probability_style)]),
-        html.Div([html.Span(faq['text'])])
+        html.Div([html.P(faq['text'], className="faq_text")])
     ],
     style={
         "boxShadow": "1px 2px 9px 0px",
@@ -67,7 +68,6 @@ def faq_data_from_predictions(probs, labels):
             'index': index
         })
 
-    print(top_three_index)
     return faqs
 
 def load_raw_faq_data():
@@ -100,5 +100,11 @@ def rev_sort(arr, n):
     # Return args of greatest n values in arr
     return arr.argsort()[-n:][::-1]
 
-def button(text, id):
-    return html.Div(html.Button(text, id=id, n_clicks_timestamp='0'), className="four columns", style={'textAlign':'center'})
+def button(text, id, icon):
+    return html.Div(
+        html.Button([
+            html.I(className=icon, style={'padding':'5px'}),
+            text
+        ], id=id, n_clicks_timestamp='0'),
+        className="three columns",
+        style={'textAlign':'center'})
