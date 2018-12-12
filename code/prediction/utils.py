@@ -12,9 +12,10 @@ from sklearn.model_selection import KFold
 #   1: precision
 #   2: recall
 #  99: precision, recall, F1-score
-def multilabel_prec(y, y_pred_proba, what_to_predict=1, nvals=5):
+def multilabel_prec(y, y_pred_proba, classes, what_to_predict=1, nvals=5):
     # predictions:
-    y_preds = np.argsort(y_pred_proba, axis=1)[:, -nvals:] - 1
+    y_preds_ind = np.argsort(y_pred_proba, axis=1)[:, -nvals:]
+    y_preds = classes[y_preds_ind]
     if np.sum(y_pred_proba) == 0:
         y_preds = np.zeros(y_preds.shape) - 1
     # classes to check:

@@ -12,9 +12,10 @@ from sklearn.model_selection import KFold
 #   1: precision
 #   2: recall
 #  99: precision, recall, F1-score
-def multilabel_prec(y, y_pred_proba, what_to_predict=1, nvals=5):
+def multilabel_prec(y, y_pred_proba, classes, what_to_predict=1, nvals=5):
     # predictions:
-    y_preds = np.argsort(y_pred_proba, axis=1)[:, -nvals:] - 1
+    y_preds_ind = np.argsort(y_pred_proba, axis=1)[:, -nvals:]
+    y_preds = classes[y_preds_ind]
     if np.sum(y_pred_proba) == 0:
         y_preds = np.zeros(y_preds.shape) - 1
     # classes to check:
@@ -83,11 +84,41 @@ def cross_val_proba_score(estimator, X, y, scoring=multilabel_prec, scoring_arg1
         y_train, y_test = y[train_index], y[test_index]
         estimator.fit(X_train, y_train)
         y_hat = estimator.predict_proba(X_test)
-        score += scoring(y_test, y_hat, what_to_predict=scoring_arg1, nvals=scoring_arg2)
+        score += scoring(y_test, y_hat, estimator.classes_, what_to_predict=scoring_arg1, nvals=scoring_arg2)
 
     score = score / n_splits
     return score
 
+
+def cross_val_proba_score_with_pre(estimatorpre, estimator, X, y, scoring=multilabel_prec, scoring_arg1=1,
+                                   scoring_arg2=5, n_splits=5):
+    kf = KFold(n_splits, shuffle=True)
+    if scoring_arg1 == 99:
+        score = np.zeros(3)
+    else:
+        score = 0
+
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        #
+        y_train_pre = np.copy(y_train)
+        y_train_pre[y_train > -1] = 0
+        X_train_post = X_train[y_train > -1]
+        y_train_post = y_train[y_train > -1]
+        estimatorpre.fit(X_train, y_train_pre)
+        estimator.fit(X_train_post, y_train_post)
+        # predict
+        yhat_pre = estimatorpre.predict_proba(X_test)
+        yhat_post = estimator.predict_proba(X_test)
+        yhat = np.array([yhat_post[i, :] * yhat_pre[i, 1] for i in range(len(yhat_pre))])
+        yhat = np.append(yhat_pre[:, 0], yhat).reshape((yhat_pre.shape[0], -1))
+        #
+        classes = np.append([-1], estimator.classes_)
+        score += scoring(y_test, yhat, classes=classes, what_to_predict=scoring_arg1, nvals=scoring_arg2)
+
+    score = score / n_splits
+    return score
 
 def cross_val_proba_score_parmap(estimator, X, y, scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5):
     kf = KFold(n_splits=n_splits, shuffle=True)
