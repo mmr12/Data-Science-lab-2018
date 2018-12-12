@@ -56,7 +56,7 @@ def classifier(model, scoring=1, n_FAQs=5):
 
     # train
     print('Training Classifier...')
-    classifier = RandomForestClassifier()  # class_weight="balanced")
+    classifier = RandomForestClassifier(class_weight="balanced")
     classifier.fit(X_train, y_train)
 
 
