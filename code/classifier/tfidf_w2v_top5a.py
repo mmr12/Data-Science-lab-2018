@@ -28,13 +28,14 @@ def top5(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
         vector = model_tfidf[corpus[ind]]
         vector_s = sorted(vector, key=itemgetter(1), reverse=True)
         top5 = vector_s[:5]
-        top5 = np.asarray(top5, dtype=int)[:,0]
+        top5 = np.asarray(top5, dtype=int)[:, 0]
         words = np.empty((len(top5), 128), dtype=float)
         for j in range(len(top5)):
             words[j] = model_w2v[dct[top5[j]]]
         mean_ans[i] = np.apply_along_axis(np.mean, 0, words)
         ind += 1
     return mean_ans
+
 
 def classification(mean_ticket_ques, mapping):
     # RANDOM FOREST CLASSIFIER
@@ -43,15 +44,15 @@ def classification(mean_ticket_ques, mapping):
     classifier_CV = RandomForestClassifier()
     cv_score = cross_val_proba_score(classifier_CV, mean_ticket_ques, mapping,
                                      scoring=multilabel_prec, scoring_arg1=1, scoring_arg2=5, n_splits=5)
-    #scores = cross_val_score(classifier_CV, mean_ticket_ques, mapping, cv=5)
-    #cv_score = scores.mean()
+    # scores = cross_val_score(classifier_CV, mean_ticket_ques, mapping, cv=5)
+    # cv_score = scores.mean()
     print('Training Classifier...')
     classifier = RandomForestClassifier()
     classifier.fit(X=mean_ticket_ques, y=mapping)
     y_pred_proba = classifier.predict_proba(mean_ticket_ques)
     dump(classifier, 'classifier/models/RF_tfidf_word2vec_5a.joblib')
     train_score = multilabel_prec(y=mapping, y_pred_proba=y_pred_proba, what_to_predict=1, nvals=5)
-    #train_score = classifier.score(X=mean_ticket_ques, y=mapping)
+    # train_score = classifier.score(X=mean_ticket_ques, y=mapping)
     print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
 
     '''
@@ -67,6 +68,7 @@ def classification(mean_ticket_ques, mapping):
     train_score = Bclassifier.score(X=mean_ticket_ques, y=mapping)
     print('Training Score: {0} \nCross Val Score: {1}'.format(train_score, cv_score))
     '''
+
 
 def tfidf_w2v_top5a(all_docs_prepro, id_dict):
     with open('../code/similarity/mappings/map_w2v_tfidf_5a.pkl', 'rb') as fp:

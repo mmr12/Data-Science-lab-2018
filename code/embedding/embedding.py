@@ -140,7 +140,7 @@ def tfidf_w2v(all_docs_prepro):
         word_path = 'embedding/models/tfidf_all.model'
         model_tfidf.save(word_path)
 
-    #WORD2VEC MODEL
+    # WORD2VEC MODEL
     exists = os.path.isfile('embedding/models/word2vec_all.model')
     if exists:
         print('Word2vec embedding model already existing')
@@ -153,7 +153,6 @@ def tfidf_w2v(all_docs_prepro):
 
 
 def tfidf_w2v_top5a(all_docs_prepro):
-
     # TFIDF MODEL
     exists = os.path.isfile('embedding/models/tfidf_all.model')
     if exists:

@@ -117,6 +117,7 @@ def tfidf_w2v(all_docs_prepro, id_dict, thresh):
     with open("../code/similarity/mappings/map_w2v_tfidf_all.pkl", "wb") as fp:
         pickle.dump(output, fp)
 
+
 def tfidf_w2v_top5a(all_docs_prepro, id_dict, thresh):
     print('Loading Word2vec model')
     model_path = 'embedding/models/word2vec_all.model'
@@ -138,6 +139,7 @@ def tfidf_w2v_top5a(all_docs_prepro, id_dict, thresh):
 
     with open("../code/similarity/mappings/map_w2v_tfidf_5a.pkl", "wb") as fp:
         pickle.dump(output, fp)
+
 
 def tfidf_w2v_top5w(all_docs_prepro, id_dict, thresh):
     print('Loading Word2vec model')

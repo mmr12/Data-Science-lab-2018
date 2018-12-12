@@ -38,6 +38,7 @@ def all_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prep
         ind += 1
     return mean_ans
 
+
 def top5(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
     if dat == 'faq_ans':
         ind = id_dict['faq_ans'][0]
@@ -56,13 +57,14 @@ def top5(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
         vector = model_tfidf[corpus[ind]]
         vector_s = sorted(vector, key=itemgetter(1), reverse=True)
         top5 = vector_s[:5]
-        top5 = np.asarray(top5, dtype=int)[:,0]
+        top5 = np.asarray(top5, dtype=int)[:, 0]
         words = np.empty((len(top5), 128), dtype=float)
         for j in range(len(top5)):
             words[j] = model_w2v[dct[top5[j]]]
         mean_ans[i] = np.apply_along_axis(np.mean, 0, words)
         ind += 1
     return mean_ans
+
 
 def top5_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_prepro):
     if dat == 'faq_ans':
@@ -85,8 +87,8 @@ def top5_average(dat, corpus, dct, model_w2v, model_tfidf, id_dict, all_docs_pre
         top5 = np.asarray(top5, dtype=float)
         words = np.empty((len(top5), 128), dtype=float)
         for j in range(len(top5)):
-            words[j] = model_w2v[dct[int(top5[j,0])]]
-        mean_ans[i] = np.average(words, 0, weights=top5[:,1])
+            words[j] = model_w2v[dct[int(top5[j, 0])]]
+        mean_ans[i] = np.average(words, 0, weights=top5[:, 1])
         ind += 1
     return mean_ans
 
