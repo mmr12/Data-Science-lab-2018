@@ -134,7 +134,7 @@ def update_output(input1):
                Input('sample-load-4', 'n_clicks_timestamp'),
                Input('clear-text', 'n_clicks_timestamp')])
 def on_click(btn1, btn2, btn3, btn4, clear_btn):
-    good_index1, good_index2, bad_index = 7, 98, 14
+    good_index1, good_index2, bad_index = 60, 59, 88
 
     timestamps = np.array([btn1, btn2, btn3, btn4, clear_btn]).astype(np.float)
     if np.max(timestamps) >0:
