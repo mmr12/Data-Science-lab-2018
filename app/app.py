@@ -37,14 +37,17 @@ names = [
 
 app.layout = html.Div([
 
+    # Links to fonts and icons
     html.Link(rel="stylesheet", href="https://use.fontawesome.com/releases/v5.6.0/css/all.css",integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h", crossOrigin="anonymous"),
+    html.Link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Lato"),
+    html.Link(rel="stylesheet", href="https://fonts.googleapis.com/css?family=Roboto"),
 
-    html.H1('Frequently Answered Questions',
+    html.H1('Natural Email Understanding',
             style={"textAlign":"center",
                    'paddingTop':"30px",
-                   "fontFamily":"Roboto",
+                   "fontFamily":"Roboto, Arial",
                    "fontStyle":"bold"}),
-    html.H2('Selecting FAQs as Responses to IT Service Tickets', style={"textAlign":"center"}),
+    html.H2('Automated FAQ Selection in IT Tickets Handling', style={"textAlign":"center"}),
     html.Div([
         dcc.Textarea(id='text-input',
                      placeholder='Write or paste Ticket Text here or select an example below',
@@ -131,7 +134,7 @@ def update_output(input1):
                Input('sample-load-4', 'n_clicks_timestamp'),
                Input('clear-text', 'n_clicks_timestamp')])
 def on_click(btn1, btn2, btn3, btn4, clear_btn):
-    good_index1, good_index2, bad_index = 7, 98, 14
+    good_index1, good_index2, bad_index = 60, 59, 88
 
     timestamps = np.array([btn1, btn2, btn3, btn4, clear_btn]).astype(np.float)
     if np.max(timestamps) >0:
