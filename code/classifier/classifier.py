@@ -50,6 +50,20 @@ def classifier(model, scoring=1, n_FAQs=5, pre=0):
             id_dict = pickle.load(fp)
         X_train, y_train = document_embedding(id_dict)
 
+    elif model == 'hybrid':
+        X_train2, y_train = RF()
+        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
+            id_dict = pickle.load(fp)
+        X_train, y_train2 = document_embedding(id_dict)
+
+    elif model == 'hybrid2':
+        X_train2, y_train = RF()
+        with open("embedding/models/doc_data/all_docs_prepro.txt", "rb") as fp:
+            all_docs_prepro = pickle.load(fp)
+        with open("embedding/models/doc_data/id_dict.txt", "rb") as fp:
+            id_dict = pickle.load(fp)
+        X_train, y_train2 = word_embedding(all_docs_prepro, id_dict)
+
     else:
         print('Model {} not found'.format(model))
         return 0
@@ -95,11 +109,13 @@ def classifier(model, scoring=1, n_FAQs=5, pre=0):
     else:
         # train
         print('Training Classifier...')
-        classifier = RandomForestClassifier(n_estimators=100)
+        classifier = RandomForestClassifier(n_estimators=100,
+                                            class_weight='balanced')
         classifier.fit(X_train, y_train)
 
         print('Running CV on Classifier...')
-        classifier_CV = RandomForestClassifier()
+        classifier_CV = RandomForestClassifier(n_estimators=100,
+                                               class_weight='balanced')
         cv_score = cross_val_proba_score(classifier_CV, X_train, y_train,
                                          scoring=multilabel_prec,
                                          scoring_arg1=scoring,
@@ -126,6 +142,13 @@ def classifier(model, scoring=1, n_FAQs=5, pre=0):
         elif model == 'doc2vec':
             dump(classifier, 'classifier/models/RF_doc2vec.joblib')
 
+        elif model == 'hybrid':
+            dump(classifier, 'classifier/models/RF_hybrid.joblib')
+
+        elif model == 'hybrid2':
+            dump(classifier, 'classifier/models/RF_hybrid2.joblib')
+
+    # return cv_score
 
 # TODO: included files here and not in directory file
 

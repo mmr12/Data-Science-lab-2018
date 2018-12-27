@@ -1,7 +1,7 @@
 import pickle
 
-from gensim.models import Word2Vec, Doc2Vec, TfidfModel
 from gensim.corpora import Dictionary
+from gensim.models import Word2Vec, Doc2Vec, TfidfModel
 from joblib import load
 
 from .utils import *
@@ -31,6 +31,15 @@ def test(model, data_prefix='../data/12-08-', scoring=99, n_FAQs=6, pre=0):
             X_test = doc_emb_new_one(test_prepo, model)
             classifier = load('classifier/models/RF_word2vec.joblib')
 
+        elif model == 'hybrid2':
+            # load data
+            with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+                test_prepo = pickle.load(fp)
+            model_path = 'embedding/models/word2vec_all.model'
+            model = Word2Vec.load(model_path)
+            X_test = doc_emb_new_one(test_prepo, model)
+            classifier = load('classifier/models/RF_hybrid2.joblib')
+
         elif model == 'doc2vec':
             # load data
             with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
@@ -40,6 +49,16 @@ def test(model, data_prefix='../data/12-08-', scoring=99, n_FAQs=6, pre=0):
             # embed data
             X_test = np.array([model.infer_vector(test_prepo[i]) for i in range(len(test_prepo))])
             classifier = load('classifier/models/RF_doc2vec.joblib')
+
+        elif model == 'hybrid':
+            # load data
+            with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+                test_prepo = pickle.load(fp)
+            # load model
+            model = Doc2Vec.load('embedding/models/' + 'doc2vec_ticket_ques.model')
+            # embed data
+            X_test = np.array([model.infer_vector(test_prepo[i]) for i in range(len(test_prepo))])
+            classifier = load('classifier/models/RF_hybrid.joblib')
 
         elif model == 'tfidf_w2v':
             # load data
@@ -65,6 +84,59 @@ def test(model, data_prefix='../data/12-08-', scoring=99, n_FAQs=6, pre=0):
                              model_tfidf=model_tfidf)
             classifier = load('classifier/models/RF_tfidf_w2v.joblib')
 
+        elif model == "tfidf_w2v_top5a":
+            # load data
+            with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+                test_prepo = pickle.load(fp)
+            # some embedding processing
+            dct = Dictionary(test_prepo)
+            corpus = [dct.doc2bow(line) for line in test_prepo]
+
+            # load models
+            print('Loading Word2vec model')
+            model_path = 'embedding/models/word2vec_all.model'
+            model_w2v = Word2Vec.load(model_path)
+
+            print('Loading Tfidf model')
+            model_path = 'embedding/models/tfidf_all.model'
+            model_tfidf = TfidfModel.load(model_path)
+
+            X_test = top5(ind_start=0,
+                          ind_end=len(test_prepo),
+                          corpus=corpus,
+                          dct=dct,
+                          model_w2v=model_w2v,
+                          model_tfidf=model_tfidf)
+
+            classifier = load('classifier/models/RF_tfidf_w2v_5a.joblib')
+
+
+        elif model == "tfidf_w2v_top5w":
+            # load data
+            with open("embedding/models/doc_data/ticket_test.txt", "rb") as fp:
+                test_prepo = pickle.load(fp)
+            # some embedding processing
+            dct = Dictionary(test_prepo)
+            corpus = [dct.doc2bow(line) for line in test_prepo]
+
+            # load models
+            print('Loading Word2vec model')
+            model_path = 'embedding/models/word2vec_all.model'
+            model_w2v = Word2Vec.load(model_path)
+
+            print('Loading Tfidf model')
+            model_path = 'embedding/models/tfidf_all.model'
+            model_tfidf = TfidfModel.load(model_path)
+
+            X_test = top5_average(ind_start=0,
+                                  ind_end=len(test_prepo),
+                                  corpus=corpus,
+                                  dct=dct,
+                                  model_w2v=model_w2v,
+                                  model_tfidf=model_tfidf)
+
+            classifier = load('classifier/models/RF_tfidf_w2v_5w.joblib')
+
         else:
             print('Model {} not found'.format(model))
             return 0
@@ -78,7 +150,7 @@ def test(model, data_prefix='../data/12-08-', scoring=99, n_FAQs=6, pre=0):
         print("When predicting all -1, precision, recall, F1-score", scores2)
 
 
-    else:
+    else:  # pre ==1
 
         if model == 'tfidf':
             x = test_dic["x_test"]
@@ -172,6 +244,68 @@ def doc_emb_new_one(doc_prepo, model):
                 words += model[sentence[i]]
                 counter += 1
         mean_ans[j] = words / counter
+    return mean_ans
+
+
+def itemgetter(*items):
+    if len(items) == 1:
+        item = items[0]
+
+        def g(obj):
+            return obj[item]
+    else:
+        def g(obj):
+            return tuple(obj[item] for item in items)
+    return g
+
+
+def top5(ind_start,
+         ind_end,
+         corpus,
+         dct,
+         model_w2v,
+         model_tfidf):
+    word_vectors = model_w2v.wv
+    length = ind_end - ind_start
+    mean_ans = np.empty((length, 128), dtype=float)
+    for i in range(length):
+        vector = model_tfidf[corpus[ind_start]]
+        vector_s = sorted(vector, key=itemgetter(1), reverse=True)
+        top5 = vector_s[:5]
+        top5 = np.asarray(top5, dtype=int)[:, 0]
+        words = np.empty((len(top5), 128), dtype=float)
+        for j in range(len(top5)):
+            if dct[int(top5[j])] in word_vectors.vocab:
+                words[j] = model_w2v[dct[top5[j]]]
+            else:
+                words[j] = 0
+        mean_ans[i] = np.apply_along_axis(np.mean, 0, words)
+        ind_start += 1
+    return mean_ans
+
+
+def top5_average(ind_start,
+                 ind_end,
+                 corpus,
+                 dct,
+                 model_w2v,
+                 model_tfidf):
+    word_vectors = model_w2v.wv
+    length = ind_end - ind_start
+    mean_ans = np.empty((length, 128), dtype=float)
+    for i in range(length):
+        vector = model_tfidf[corpus[ind_start]]
+        vector_s = sorted(vector, key=itemgetter(1), reverse=True)
+        top5 = vector_s[:5]
+        top5 = np.asarray(top5, dtype=float)
+        words = np.empty((len(top5), 128), dtype=float)
+        for j in range(len(top5)):
+            if dct[int(top5[j, 0])] in word_vectors.vocab:
+                words[j] = model_w2v[dct[int(top5[j, 0])]]
+            else:
+                words[j] = 0
+        mean_ans[i] = np.average(words, 0, weights=top5[:, 1])
+        ind_start += 1
     return mean_ans
 
 

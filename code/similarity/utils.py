@@ -1,6 +1,7 @@
+from operator import itemgetter
+
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-from operator import itemgetter
 
 
 # compute sentence embedding for word2vec
@@ -110,6 +111,7 @@ def compute_sim(mean_ticket_ans, mean_faq_ans, thresh):
     uniques, counts = np.unique(FAQ_per_ticket, return_counts=True)
     n_unique = len(uniques)
     solo_classes = np.sum(counts == 1)
+    # print("threshold should be ", np.quantile(strength_FAQ_ticket,0.75))
     n_nonassigned = np.shape(FAQ_per_ticket[strength_FAQ_ticket < thresh])[0]
     n_tickets = len(FAQ_per_ticket)
     # How many tickets each FAQ is assigned

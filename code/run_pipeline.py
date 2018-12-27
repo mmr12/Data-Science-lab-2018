@@ -1,8 +1,8 @@
-from embedding.embedding import embedding
-from classifier.classifier import classifier
-from similarity.similarity import similarity
-from prediction.test import *
 import numpy as np
+from classifier.classifier import classifier
+from embedding.embedding import embedding
+from prediction.test import *
+from similarity.similarity import similarity
 
 MODEL = 'tfidf'
 # thresholds
@@ -22,7 +22,7 @@ else:
     print("Please select valid model")
 SIM_THRESH = thresh
 DATA_PREFIX = '../data/12-08-'
-PRECLASSIFIER = 1
+PRECLASSIFIER = 0
 SCORE = 99  # 0: F1, 1:precision, 2:recall, 99: precision, recall, F1-score
 NFAQS = 3  # n FAQs to be considered for the top answer
 if __name__== "__main__" :
@@ -31,25 +31,50 @@ if __name__== "__main__" :
     # classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
 
     # predict()
-    scores = np.zeros((5, 3))
+    scores = np.zeros((6, 3))
+    cv_scores = np.zeros((6, 3))
+
     MODEL = "tfidf"
-    classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    cv_scores[0, :] = classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
     scores[0, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
 
     MODEL = "doc2vec"
-    classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    cv_scores[1, :] = classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
     scores[1, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    # print(cv_scores)
+    # print(scores)
 
     MODEL = "word2vec"
-    classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    cv_scores[2, :] = classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
     scores[2, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
 
     MODEL = "tfidf_w2v"
-    classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    cv_scores[3, :] = classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
     scores[3, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
 
+    MODEL = "tfidf_w2v_top5a"
+    cv_scores[3, :] = classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    scores[4, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+
+    MODEL = "tfidf_w2v_top5w"
+    cv_scores[4, :] = classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    scores[5, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+
+    print(cv_scores)
     print(scores)
-    # TODO: test(doc2vec) outputs scores (nan, 0.0, nan)
-    # TODO: link test and word2vec
-    # TODO: (future) link tfidf_w2v with test
+
+    SIM_THRESH = .965
+    MODEL = "tfidf_w2v_top5w"
+    # embedding(model=MODEL, data_prefix=DATA_PREFIX)
+    # similarity(model=MODEL, thresh=SIM_THRESH)
+    # classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    scores[0, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    MODEL = "tfidf_w2v_top5a"
+    embedding(model=MODEL, data_prefix=DATA_PREFIX)
+    similarity(model=MODEL, thresh=SIM_THRESH)
+    classifier(model=MODEL, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+    scores[1, :] = test(MODEL, data_prefix=DATA_PREFIX, scoring=SCORE, n_FAQs=NFAQS, pre=PRECLASSIFIER)
+
+    print(scores)
+
     # TODO: mirror test with validate
