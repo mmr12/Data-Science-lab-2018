@@ -1,10 +1,10 @@
 # DSL2018-Proj-ETH-IT
 ## Project description
-Data Science master student semester project on the automation of answering questions received by ETH IT service using an internal FAQ list. For more details please refer to 'reports/*'
+Data Science master student semester project on the automation of answering questions received by ETH IT service using an internal FAQ list. For more details please refer to `reports/*`
 
 ## Running the pipeline:
-modify 'code/run_pipeline.py' to chosen experiment
-run 'python code/run_pipeline.py' 
+modify `code/run_pipeline.py` to chosen experiment
+run `python code/run_pipeline.py`
 
 Project Organization
 ------------
