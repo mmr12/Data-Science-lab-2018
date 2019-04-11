@@ -15,9 +15,9 @@ run 'python code/run_pipeline.py'
 Project Organization
 ------------
 
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── README.md                 <- The top-level README for developers using this project.
     │
-    ├── data               <- Not available on Git for privacy reasons.
+    ├── data                      <- Not available on Git for privacy reasons.
     │
     ├── PreparationWork           <- Jupyter notebooks. 
     │                                Contains all data cleaning and exploratory work.
@@ -26,7 +26,8 @@ Project Organization
     │
     ├── code                      <- Source code for use in this project.
     │   ├── run_pipeline.py       <- Script to run the full pipeline.
-    │   │                            Aknowledging bad CS practices, this is the file to modify to run different experiments
+    │   │                            Aknowledging bad CS practices, this is the file to modify 
+    │   │                            to run different experiments
     │   │
     │   ├── embedding             <- Scripts to embedd clean data into matrix form
     │   │   ├── preprocessing.py
@@ -34,8 +35,9 @@ Project Organization
     │   │
     │   ├── similarity            <- Scripts to tag ticket answers using unsupervised ML
     │   │   
-    │   ├── classifier            <- Scripts to classify ticket questions using tagged FAQ using multiclass classification
-    │   │                            Different embeddings use different files
+    │   ├── classifier            <- Scripts to classify ticket questions using tagged FAQ using 
+    │   │                            multiclass classification.
+    │   │                            
     │   ├── visualisation         <- Scripts to visualise embeddings
     │   │
     │   └── archive               <- Archive of older attempts - to be ignored
